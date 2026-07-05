@@ -6,7 +6,7 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Instala o Service Worker e guarda o esqueleto do app no cache
+// Instala o Service Worker e guarda o esqueleto inicial no cache
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -15,7 +15,7 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// Ativa o SW e limpa caches antigos se houverem atualizações
+// Ativa o SW e limpa caches antigos automaticamente
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -30,25 +30,29 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Estratégia de Cache: Serve do cache se existir, senão busca na rede e salva
+// Intercepta as requisições e gerencia o cache dinâmico de imagens e mídias externas
 self.addEventListener('fetch', (e) => {
+  // Ignora chamadas que não sejam do tipo GET
   if (e.request.method !== 'GET') return;
 
-  // Evita tentar cachear esquemas de arquivos locais temporários (blob: ou data:)
+  // Ignora links locais em formato data: ou blob:
   if (e.request.url.startsWith('data:') || e.request.url.startsWith('blob:')) return;
 
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request).then((networkResponse) => {
-        // Faz o cache se a resposta for bem-sucedida (status 200 ou 0 para CDNs externos)
+      const fetchPromise = fetch(e.request).then((networkResponse) => {
+        // status 200 = sucesso local / status 0 = sucesso de servidores externos (imagens/CDNs)
         if (networkResponse.status === 200 || networkResponse.status === 0) {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
         }
         return networkResponse;
       }).catch(() => {
-        // Silencia falhas de rede se estiver offline
+        // Silencia erros caso o usuário fique sem internet e tente buscar um recurso novo
       });
+
+      // Retorna o cache instantaneamente se existir, caso contrário aguarda a rede
+      return cachedResponse || fetchPromise;
     })
   );
 });
