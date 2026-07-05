@@ -6,7 +6,7 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Instala o Service Worker e guarda o esqueleto do app no cache
+// Instala o Service Worker e guarda o esqueleto do app no cache.
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
