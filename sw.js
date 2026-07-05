@@ -6,7 +6,7 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Instala o Service Worker e guarda o esqueleto do app no cache.
+// Instala o Service Worker e guarda o esqueleto do app no cache
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -30,23 +30,24 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Estratégia de Cache: Serve o que está salvo para carregar instantaneamente,
-// mas busca na rede para atualizar caso o usuário mude o código do index.html.
-
+// Estratégia de Cache: Serve do cache se existir, senão busca na rede e salva
 self.addEventListener('fetch', (e) => {
-  // Ignora chamadas que não são GET (como POST/PUT)
   if (e.request.method !== 'GET') return;
+
+  // Evita tentar cachear esquemas de arquivos locais temporários (blob: ou data:)
+  if (e.request.url.startsWith('data:') || e.request.url.startsWith('blob:')) return;
 
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
-      // Se estiver no cache, retorna ele. Se não, busca na rede.
       return cachedResponse || fetch(e.request).then((networkResponse) => {
-        // Só faz cache de respostas válidas (status 200)
-        if (networkResponse.status === 200) {
+        // Faz o cache se a resposta for bem-sucedida (status 200 ou 0 para CDNs externos)
+        if (networkResponse.status === 200 || networkResponse.status === 0) {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
         }
         return networkResponse;
+      }).catch(() => {
+        // Silencia falhas de rede se estiver offline
       });
     })
   );
