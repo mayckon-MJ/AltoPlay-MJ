@@ -15,7 +15,7 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// Ativa o SW e limpa caches antigos automaticamente
+// Ativa o SW e limpa caches antigos automaticamente.
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
