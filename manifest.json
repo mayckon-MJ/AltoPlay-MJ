@@ -1,4 +1,5 @@
 
+
 {
   "name": "Auto Play MJ",
   "short_name": "AutoPlayMJ",
@@ -10,9 +11,9 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/play.svg",
+      "src": "https://cdn-icons-png.flaticon.com/512/5216/5216654.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
