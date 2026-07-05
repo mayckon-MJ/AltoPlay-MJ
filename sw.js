@@ -3,7 +3,7 @@ const CACHE_NAME = 'autoplaymj-v1';
 const ASSETS = [
   './',
   './index.html',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  'https://i.ibb.co/WJB55vX/119623.png'
 ];
 
 // Instala o Service Worker e guarda o esqueleto inicial no cache
