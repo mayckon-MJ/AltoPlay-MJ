@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Auto Play MJ</title>
+    
+    <!-- Configurações para PWA (Android/iOS) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Auto Play MJ">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/play.svg">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -34,6 +43,73 @@
             position: relative;
             display: flex;
             flex-direction: column;
+        }
+
+        /* TELA DE INÍCIO SPLASH SCREEN (ESTILO INFINITEPAY) */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, pointer-events 0.5s ease;
+        }
+
+        .splash-image-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #111111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            /* Executa a animação de pulso laranja exatamente 3 vezes (durando 1 segundo cada ciclo) */
+            animation: infinitepay-pulse 1s ease-in-out;
+            animation-iteration-count: 3;
+            margin-bottom: 25px;
+        }
+
+        .splash-image-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Caso falte imagem, um ícone padrão como fallback interno */
+        .splash-image-container i {
+            font-size: 4rem;
+            color: var(--laranja-vivo);
+        }
+
+        .splash-brand-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        @keyframes infinitepay-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.7);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 40px 20px rgba(255, 102, 0, 0.3);
+                transform: scale(1.05);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 102, 0, 0);
+                transform: scale(1);
+            }
         }
 
         /* HUD SUPERIOR REFORMULADO */
@@ -507,6 +583,13 @@
             gap: 12px;
         }
 
+        /* COR RIGIDA DA FRASE: "Baixar Pasta" na cor Laranja */
+        #btnDownloadFolder {
+            border-color: var(--laranja-vivo);
+            color: var(--laranja-vivo);
+            background: rgba(255, 102, 0, 0.05);
+        }
+
         .folder-songs-list {
             flex: 1;
             overflow-y: auto;
@@ -601,6 +684,16 @@
 </head>
 <body>
 
+    <!-- TELA PRETA DE INÍCIO (ESTILO INFINITEPAY) -->
+    <div id="splash-screen">
+        <div class="splash-image-container" id="splashPulseElement">
+            <!-- Insira o link da sua imagem redonda na tag src abaixo -->
+            <img src="https://via.placeholder.com/150" alt="Logo" onerror="this.style.display='none'">
+            <i class="fa-solid fa-play"></i>
+        </div>
+        <div class="splash-brand-name">Alto Play MJ</div>
+    </div>
+
     <div class="toast" id="toastBox">Notificação</div>
 
     <!-- HUD SUPERIOR -->
@@ -666,7 +759,7 @@
 
     <!-- LISTA DE REPRODUÇÃO -->
     <div class="playlist-section">
-        <div class="playlist-header">Fila de reprodução ativa</div>
+        <div class="playlist-header">Fila de reprodução activa</div>
         <div class="tracks-list" id="playlistContainer">
             <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
                 Fila vazia. Escolha uma pasta no menu ou importe arquivos baixados.
@@ -712,7 +805,7 @@
                 <div class="folder-view-subtitle" id="folderViewCount">0 músicas disponíveis</div>
             </div>
             <div class="folder-view-actions">
-                <button class="import-btn-label" id="btnDownloadFolder" onclick="downloadCurrentFolderFull()" style="border-color: #ffaa00;">
+                <button class="import-btn-label" id="btnDownloadFolder" onclick="downloadCurrentFolderFull()">
                     <i class="fa-solid fa-cloud-arrow-down"></i> Baixar Pasta
                 </button>
                 <button class="close-sidebar-btn" onclick="closeFolderView()">
@@ -726,6 +819,19 @@
     </div>
 
     <script>
+        // LÓGICA DO SPLASH SCREEN (ACAO DO PULSO 3 VEZES E ENTRAR NO SISTEMA)
+        const splashScreen = document.getElementById('splash-screen');
+        const splashPulseElement = document.getElementById('splashPulseElement');
+
+        splashPulseElement.addEventListener('animationend', () => {
+            // Quando a animação terminar suas 3 repetições, esconde a tela preta
+            splashScreen.style.opacity = '0';
+            splashScreen.style.pointerEvents = 'none';
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 500);
+        });
+
         // CONFIGURAÇÕES E ESTADOS
         let playlist = [];
         let currentIndex = -1;
