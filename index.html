@@ -1274,7 +1274,7 @@
             }
         }
 
-        function renderPlaylistUI() {
+                function renderPlaylistUI() {
             if (playlist.length === 0) {
                 playlistContainer.innerHTML = `
                     <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
@@ -1292,13 +1292,48 @@
                     <div class="track-item-info" onclick="changeTrack(${index}, true)">
                         <div class="track-item-title">${track.title}</div>
                     </div>
-                    <button class="track-item-action-btn" onclick="downloadTrackDirect(${index})" title="Baixar esta faixa">
-                        <i class="fa-solid fa-download"></i>
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <button class="track-item-action-btn" onclick="downloadTrackDirect(${index})" title="Baixar esta faixa">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <button class="track-item-action-btn" onclick="removeTrackFromPlaylist(${index}, event)" style="color: #ff3333;" title="Remover da fila">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
                 `;
                 playlistContainer.appendChild(item);
             });
         }
+
+                function removeTrackFromPlaylist(index, event) {
+            event.stopPropagation(); // Impede que a música toque ao clicar no X
+            
+            // Remove o item da lista
+            playlist.splice(index, 1);
+            
+            if (playlist.length === 0) {
+                // Se a lista esvaziou, reseta o player
+                currentIndex = -1;
+                pauseAudio();
+                currentTrackTitle.innerText = "Nenhuma música na fila";
+                currentTrackIndex.innerText = "Abra o menu ou adicione mídias";
+                audioNode.src = "";
+            } else if (index === currentIndex) {
+                // Se removeu a música que estava tocando agora
+                if (currentIndex >= playlist.length) {
+                    currentIndex = 0; // Volta para o início se era a última
+                }
+                changeTrack(currentIndex, isPlaying);
+            } else if (index < currentIndex) {
+                // Ajusta o índice ativo se removeu uma música que estava antes da atual
+                currentIndex--;
+            }
+            
+            renderPlaylistUI();
+            savePlayerState();
+            showToast("Música removida da fila");
+        }
+
 
         function changeTrack(index, autoPlay = true) {
             if (index < 0 || index >= playlist.length) return;
