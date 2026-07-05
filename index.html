@@ -1,0 +1,1216 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auto Play MJ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-puro: #000000;
+            --laranja-vivo: #ff6600;
+            --laranja-glow: rgba(255, 102, 0, 0.35);
+            --vidro-bg: rgba(18, 18, 18, 0.75);
+            --vidro-borda: rgba(255, 102, 0, 0.25);
+            --vidro-blur: blur(25px);
+            --card-bg: rgba(30, 30, 30, 0.45);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-puro);
+            color: #ffffff;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HUD SUPERIOR REFORMULADO */
+        .header-player {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 102, 0, 0.15);
+            background: rgba(10, 10, 10, 0.8);
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-trigger {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .menu-trigger:active {
+            color: var(--laranja-vivo);
+        }
+
+        .brand-logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--laranja-vivo), #ffaa00);
+            box-shadow: 0 0 10px var(--laranja-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        .brand-logo-circle i {
+            color: #000;
+            font-size: 0.95rem;
+        }
+
+        .brand-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #ffffff, #ff9900);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .import-btn-label {
+            background: var(--vidro-bg);
+            border: 1px solid var(--vidro-borda);
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .import-btn-label:active {
+            transform: scale(0.95);
+            background: rgba(255, 102, 0, 0.15);
+        }
+
+        /* ÁREA PRINCIPAL DO PLAYER */
+        .now-playing-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .disc-art {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: var(--vidro-bg);
+            border: 3px solid var(--laranja-vivo);
+            box-shadow: 0 0 35px var(--laranja-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .disc-art.playing {
+            animation: spin 12s linear infinite;
+        }
+
+        .disc-art i {
+            font-size: 4.5rem;
+            color: var(--laranja-vivo);
+        }
+
+        .track-name {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            padding: 0 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .track-artist {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* BARRA DE PROGRESSO */
+        .progress-container {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--laranja-vivo);
+            border-radius: 10px;
+            box-shadow: 0 0 8px var(--laranja-vivo);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #aaa;
+            font-family: monospace;
+        }
+
+        /* CONTROLES E SELETORES DE MODO */
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-btn:active {
+            transform: scale(0.85);
+        }
+
+        .control-btn.btn-play-pause {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--vidro-bg);
+            border: 1px solid var(--vidro-borda);
+            font-size: 1.5rem;
+            color: var(--laranja-vivo);
+            box-shadow: 0 0 15px var(--laranja-glow);
+        }
+
+        .control-btn.active-mode {
+            color: var(--laranja-vivo) !important;
+            text-shadow: 0 0 10px var(--laranja-vivo);
+        }
+
+        /* FILA DE REPRODUÇÃO - CORRIGIDA E DESTRAVADA */
+        .playlist-section {
+            height: 38%;
+            background: rgba(10, 10, 10, 0.9);
+            border-top: 1px solid var(--vidro-borda);
+            backdrop-filter: var(--vidro-blur);
+            -webkit-backdrop-filter: var(--vidro-blur);
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px;
+            z-index: 5;
+        }
+
+        .playlist-header {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .tracks-list {
+            flex: 1;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: 20px;
+        }
+
+        .track-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.02);
+            padding: 12px 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .track-item.active-track {
+            border-color: var(--vidro-borda);
+            background: rgba(255, 102, 0, 0.08);
+        }
+
+        .track-item-info {
+            flex: 1;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .track-item-title {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-item.active-track .track-item-title {
+            color: var(--laranja-vivo);
+            font-weight: 500;
+        }
+
+        .track-item-action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .track-item-action-btn:active {
+            color: var(--laranja-vivo);
+        }
+
+        /* SIDEBAR LATERAL DE CONFIGURAÇÕES / PASTAS */
+        .sidebar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 82%;
+            max-width: 340px;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.96);
+            border-right: 1px solid var(--vidro-borda);
+            backdrop-filter: var(--vidro-blur);
+            -webkit-backdrop-filter: var(--vidro-blur);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-overlay.open .sidebar-panel {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,102,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .close-sidebar-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .folders-container {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .folder-item {
+            padding: 14px 16px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .folder-item:active {
+            transform: scale(0.97);
+        }
+
+        .folder-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .folder-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .folder-info-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .folder-download-all-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Rodapé Fixo da Sidebar - Pasta de Favoritas */
+        .sidebar-footer-favorites {
+            padding: 15px;
+            border-top: 1px solid rgba(255,102,0,0.2);
+            background: rgba(20, 5, 0, 0.4);
+        }
+
+        /* PAINEL DE VISUALIZAÇÃO INTERNA DA PASTA MÚSICAS SERVER */
+        .folder-view-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 120;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .folder-view-overlay.open {
+            transform: translateY(0);
+        }
+
+        .folder-view-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,102,0,0.2);
+        }
+
+        .folder-view-title-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .folder-view-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .folder-view-subtitle {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .folder-view-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .folder-songs-list {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .server-song-item {
+            background: rgba(20,20,20,0.7);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 12px 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .server-song-info {
+            flex: 1;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .server-song-title {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .server-song-sub {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .server-song-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .heart-btn {
+            background: none;
+            border: none;
+            color: #444;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .heart-btn.active-heart {
+            color: var(--laranja-vivo) !important;
+        }
+
+        /* TOAST SYSTEM */
+        .toast {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(25,25,25,0.95);
+            border: 1px solid var(--laranja-vivo);
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 200;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            from { transform: scale(1); box-shadow: 0 0 5px var(--laranja-glow); }
+            to { transform: scale(1.04); box-shadow: 0 0 15px var(--laranja-vivo); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toastBox">Notificação</div>
+
+    <!-- HUD SUPERIOR -->
+    <div class="header-player">
+        <div class="header-left">
+            <button class="menu-trigger" onclick="toggleSidebar(true)">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="brand-logo-wrapper">
+                <div class="brand-logo-circle">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+                <span class="brand-name">Auto Play MJ</span>
+            </div>
+        </div>
+        
+        <label class="import-btn-label" for="audioFileInput">
+            <i class="fa-solid fa-file-medical"></i> Adicionar
+        </label>
+        <input type="file" id="audioFileInput" multiple accept="audio/*" style="display: none;" onchange="handleFileSelect(event)">
+    </div>
+
+    <!-- PLAYER PRINCIPAL -->
+    <div class="now-playing-section">
+        <div class="disc-art" id="discElement">
+            <i class="fa-solid fa-compact-disc"></i>
+        </div>
+        <div class="track-name" id="currentTrackTitle">Nenhuma música na fila</div>
+        <div class="track-artist" id="currentTrackIndex">Abra o menu ou adicione mídias</div>
+
+        <!-- BARRA PROGRESSO -->
+        <div class="progress-container">
+            <div class="progress-bar-bg" id="progressBarBg" onclick="seekAudio(event)">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-info">
+                <span id="timeCurrent">00:00</span>
+                <span id="timeTotal">00:00</span>
+            </div>
+        </div>
+
+        <!-- CONTROLES COM MODOS DE REPRODUÇÃO SOLICITADOS -->
+        <div class="player-controls">
+            <button class="control-btn active-mode" id="modeListBtn" onclick="setPlaybackMode('list')" title="Tocar em Ordem da Lista">
+                <i class="fa-solid fa-list-ol"></i>
+            </button>
+            <button class="control-btn" id="modeShuffleBtn" onclick="setPlaybackMode('shuffle')" title="Modo Aleatório">
+                <i class="fa-solid fa-shuffle"></i>
+            </button>
+            <button class="control-btn" id="modeLoopBtn" onclick="setPlaybackMode('loop')" title="Repetir Música">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+            
+            <span style="width: 10px;"></span>
+
+            <button class="control-btn" onclick="playPrevious()"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="control-btn btn-play-pause" onclick="togglePlayPause()">
+                <i class="fa-solid fa-play" id="mainPlayIcon"></i>
+            </button>
+            <button class="control-btn" onclick="playNext()"><i class="fa-solid fa-forward-step"></i></button>
+        </div>
+    </div>
+
+    <!-- LISTA DE REPRODUÇÃO -->
+    <div class="playlist-section">
+        <div class="playlist-header">Fila de reprodução ativa</div>
+        <div class="tracks-list" id="playlistContainer">
+            <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
+                Fila vazia. Escolha uma pasta no menu ou importe arquivos baixados.
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR DE CONFIGURAÇÃO / 15 PASTAS -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)">
+        <div class="sidebar-panel" onclick="event.stopPropagation()">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Bibliotecas de Áudio</div>
+                <button class="close-sidebar-btn" onclick="toggleSidebar(false)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- LISTA DE PASTAS -->
+            <div class="folders-container" id="foldersContainer">
+                <!-- Injetado via JS -->
+            </div>
+
+            <!-- RODAPÉ FIXO: PASTA DE FAVORITAS -->
+            <div class="sidebar-footer-favorites">
+                <div class="folder-item" style="background: rgba(255, 102, 0, 0.1); border: 1px solid var(--vidro-borda);" onclick="openFolderContainer(-1)">
+                    <div class="folder-left">
+                        <div class="folder-icon-box" style="background: #ff6600; color: #fff;">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <div class="folder-info-name">Favoritas (Músicas Curtidas)</div>
+                    </div>
+                    <span style="font-size: 0.8rem; color: #ff6600;" id="favCountBadge">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DA PASTA SELECIONADA -->
+    <div class="folder-view-overlay" id="folderViewOverlay">
+        <div class="folder-view-header">
+            <div class="folder-view-title-area">
+                <div class="folder-view-title" id="folderViewTitle">Nome da Pasta</div>
+                <div class="folder-view-subtitle" id="folderViewCount">0 músicas disponíveis</div>
+            </div>
+            <div class="folder-view-actions">
+                <button class="import-btn-label" id="btnDownloadFolder" onclick="downloadCurrentFolderFull()" style="border-color: #ffaa00;">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Baixar Pasta
+                </button>
+                <button class="close-sidebar-btn" onclick="closeFolderView()">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+        <div class="folder-songs-list" id="folderSongsContainer">
+            <!-- Músicas da pasta selecionada -->
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÕES E ESTADOS
+        let playlist = [];
+        let currentIndex = -1;
+        let isPlaying = false;
+        let playbackMode = 'list'; // 'list' | 'shuffle' | 'loop'
+        let favoriteTracks = JSON.parse(localStorage.getItem('MJ_Favorites')) || [];
+
+        const audioNode = new Audio();
+
+        // Elementos DOM
+        const discElement = document.getElementById('discElement');
+        const currentTrackTitle = document.getElementById('currentTrackTitle');
+        const currentTrackIndex = document.getElementById('currentTrackIndex');
+        const progressFill = document.getElementById('progressFill');
+        const progressBarBg = document.getElementById('progressBarBg');
+        const timeCurrent = document.getElementById('timeCurrent');
+        const timeTotal = document.getElementById('timeTotal');
+        const mainPlayIcon = document.getElementById('mainPlayIcon');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const toastBox = document.getElementById('toastBox');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const foldersContainer = document.getElementById('foldersContainer');
+        const folderViewOverlay = document.getElementById('folderViewOverlay');
+        const folderViewTitle = document.getElementById('folderViewTitle');
+        const folderViewCount = document.getElementById('folderViewCount');
+        const folderSongsContainer = document.getElementById('folderSongsContainer');
+        const favCountBadge = document.getElementById('favCountBadge');
+
+        // DEFINIÇÃO DAS 15 PASTAS DO MENU
+        const folderDatabase = [
+            { id: 1, name: "Sertanejo Universitário", color: "#ff2a6d", bgIcon: "🎸", key: "sertanejo" },
+            { id: 2, name: "Hip Hop & Rap", color: "#05d9e8", bgIcon: "🎤", key: "hiphop" },
+            { id: 3, name: "As Mais Tocadas (Top 50)", color: "#01012b", bgIcon: "🔥", key: "top50" },
+            { id: 4, name: "Eletrônica & Dance", color: "#39ff14", bgIcon: "⚡", key: "eletronica" },
+            { id: 5, name: "Funk Premium", color: "#ff007f", bgIcon: "🔊", key: "funk" },
+            { id: 6, name: "Pop Internacional", color: "#f5a623", bgIcon: "⭐", key: "pop" },
+            { id: 7, name: "Rock & Heavy Metal", color: "#795548", bgIcon: "💀", key: "rock" },
+            { id: 8, name: "Reggae & Vibes", color: "#4caf50", bgIcon: "🍁", key: "reggae" },
+            { id: 9, name: "Pagode & Samba", color: "#ffeb3b", bgIcon: "🪘", key: "pagode" },
+            { id: 10, name: "Modão Sertanejo", color: "#9c27b0", bgIcon: "🤠", key: "modao" },
+            { id: 11, name: "Trap Nacional", color: "#00bcd4", bgIcon: "💎", key: "trap" },
+            { id: 12, name: "Flashback 80/90", color: "#e91e63", bgIcon: "📼", key: "flashback" },
+            { id: 13, name: "R&B / Soul", color: "#673ab7", bgIcon: "🍷", key: "rnb" },
+            { id: 14, name: "Gospel / Louvores", color: "#3f51b5", bgIcon: "🙏", key: "gospel" },
+            { id: 15, name: "Lo-Fi Beats (Para Dirigir)", color: "#009688", bgIcon: "☕", key: "lofi" }
+        ];
+
+        // =========================================================================
+        // GERENCIADOR DE MÚSICAS: ADICIONE OS ENDEREÇOS E NOMES DAS MÚSICAS AQUI!
+        // =========================================================================
+        const playlistManager = {
+            sertanejo: [
+                { title: "Nome da Música Sertaneja 1", artist: "Artista 1", url: "https://raw.githubusercontent.com/SEU_USER/REPOSITORIO/main/Sertanejo/musica1.mp3", filename: "sertanejo1.mp3" },
+                { title: "Teste MJ-KA", artist: "Fernandimho", url: "musicateste.mp3", filename: "sertanejo2.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            hiphop: [
+                { title: "Rap Música 1", artist: "Rapper X", url: "LINK_DA_MUSICA", filename: "hiphop1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            top50: [
+                { title: "Top Hit 1", artist: "Sucesso Anual", url: "LINK_DA_MUSICA", filename: "top1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            eletronica: [
+                { title: "Eletronica 1", artist: "DJ Beat", url: "LINK_DA_MUSICA", filename: "electro1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            funk: [
+                { title: "Funk Track 1", artist: "MC Som", url: "LINK_DA_MUSICA", filename: "funk1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            pop: [
+                { title: "Pop International 1", artist: "Diva Pop", url: "LINK_DA_MUSICA", filename: "pop1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            rock: [
+                { title: "Rock Classic 1", artist: "Banda de Rock", url: "LINK_DA_MUSICA", filename: "rock1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            reggae: [
+                { title: "Reggae Track 1", artist: "Vibe Positiva", url: "LINK_DA_MUSICA", filename: "reggae1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            pagode: [
+                { title: "Pagode de Mesa 1", artist: "Grupo Samba", url: "LINK_DA_MUSICA", filename: "pagode1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            modao: [
+                { title: "Modão Antigo 1", artist: "Dupla Raiz", url: "LINK_DA_MUSICA", filename: "modao1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            trap: [
+                { title: "Trap Nacional 1", artist: "Trapper Br", url: "LINK_DA_MUSICA", filename: "trap1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            flashback: [
+                { title: "Flashback 80s Hits 1", artist: "Retrô Band", url: "LINK_DA_MUSICA", filename: "flashback1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            rnb: [
+                { title: "Soul R&B Track 1", artist: "Vocalist Premium", url: "LINK_DA_MUSICA", filename: "rnb1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            gospel: [
+                { title: "Louvor Adoração 1", artist: "Ministério Fé", url: "LINK_DA_MUSICA", filename: "gospel1.mp3" }
+            ],
+            //🎶🎶🎶🎶
+            lofi: [
+                { title: "Lo-Fi Calm Beat 1", artist: "Relax Mind", url: "LINK_DA_MUSICA", filename: "lofi1.mp3" }
+            ]
+        };
+
+        let currentActiveOpenFolderIdx = null;
+        let activeFolderSongsList = [];
+
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            renderFoldersUI();
+            updateFavBadge();
+        });
+
+        function showToast(msg) {
+            toastBox.innerText = msg;
+            toastBox.classList.add('show');
+            setTimeout(() => toastBox.classList.remove('show'), 2500);
+        }
+
+        // SIDEBAR ACTIONS
+        function toggleSidebar(open) {
+            if(open) sidebarOverlay.classList.add('open');
+            else sidebarOverlay.classList.remove('open');
+        }
+
+        function renderFoldersUI() {
+            foldersContainer.innerHTML = "";
+            folderDatabase.forEach((folder, idx) => {
+                const fItem = document.createElement('div');
+                fItem.className = 'folder-item';
+                fItem.style.backgroundColor = 'rgba(25, 25, 25, 0.6)';
+                fItem.style.borderLeft = `4px solid ${folder.color}`;
+                fItem.onclick = () => openFolderContainer(idx);
+
+                fItem.innerHTML = `
+                    <div class="folder-left">
+                        <div class="folder-icon-box" style="background: ${folder.color};">
+                            ${folder.bgIcon}
+                        </div>
+                        <div class="folder-info-name">${folder.name}</div>
+                    </div>
+                    <button class="folder-download-all-btn" onclick="downloadFolderFromSidebar(${idx}, event)" title="Baixar toda a pasta">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                `;
+                foldersContainer.appendChild(fItem);
+            });
+        }
+
+        // VISUALIZAÇÃO INTERNA DA PASTA SELECIONADA
+        function openFolderContainer(index) {
+            toggleSidebar(false);
+            currentActiveOpenFolderIdx = index;
+            folderSongsContainer.innerHTML = "";
+
+            if (index === -1) {
+                // Pasta Favoritos
+                folderViewTitle.innerText = "Músicas Favoritas";
+                activeFolderSongsList = [...favoriteTracks];
+                document.getElementById('btnDownloadFolder').style.display = 'none';
+            } else {
+                // Pastas Temáticas estruturadas vindas do playlistManager
+                const folder = folderDatabase[index];
+                folderViewTitle.innerText = folder.name;
+                activeFolderSongsList = playlistManager[folder.key] || [];
+                document.getElementById('btnDownloadFolder').style.display = 'block';
+            }
+
+            folderViewCount.innerText = `${activeFolderSongsList.length} faixas encontradas`;
+
+            if(activeFolderSongsList.length === 0) {
+                folderSongsContainer.innerHTML = `<div style="color:#555; text-align:center; padding-top:40px;">Esta pasta não possui músicas configuradas no momento.</div>`;
+            } else {
+                activeFolderSongsList.forEach((song, sIdx) => {
+                    const isFav = favoriteTracks.some(f => f.url === song.url);
+                    const sItem = document.createElement('div');
+                    sItem.className = 'server-song-item';
+                    sItem.innerHTML = `
+                        <div class="server-song-info" onclick="loadServerTrackToPlaylist(${sIdx})">
+                            <div class="server-song-title">${song.title}</div>
+                            <div class="server-song-sub">${song.artist}</div>
+                        </div>
+                        <div class="server-song-controls">
+                            <button class="heart-btn ${isFav ? 'active-heart' : ''}" onclick="toggleFavoriteSong(${sIdx}, this)">
+                                <i class="fa-solid fa-heart"></i>
+                            </button>
+                            <button class="track-item-action-btn" onclick="downloadServerFile('${song.url}', '${song.filename}')">
+                                <i class="fa-solid fa-download"></i>
+                            </button>
+                        </div>
+                    `;
+                    folderSongsContainer.appendChild(sItem);
+                });
+            }
+
+            folderViewOverlay.classList.add('open');
+        }
+
+        function closeFolderView() {
+            folderViewOverlay.classList.remove('open');
+        }
+
+        // ENVIA A REPRODUÇÃO DA PASTA PARA A PLAYLIST PRINCIPAL
+        function loadServerTrackToPlaylist(songIndex) {
+            playlist = [...activeFolderSongsList];
+            renderPlaylistUI();
+            closeFolderView();
+            changeTrack(songIndex, true);
+            showToast("Tocando faixas selecionadas da pasta");
+        }
+
+        // CARREGAMENTO MANUAL DE ARQUIVOS BAIXADOS (DO CELULAR)
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileURL = URL.createObjectURL(file);
+                
+                playlist.push({
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    artist: "Arquivo Local Baixado",
+                    url: fileURL,
+                    isLocal: true
+                });
+            }
+
+            showToast(`${files.length} música(s) adicionada(s) à Fila`);
+            renderPlaylistUI();
+
+            if (currentIndex === -1 && playlist.length > 0) {
+                changeTrack(0, true);
+            }
+        }
+
+        function renderPlaylistUI() {
+            if (playlist.length === 0) {
+                playlistContainer.innerHTML = `
+                    <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
+                        Fila vazia. Escolha uma pasta no menu ou importe arquivos baixados.
+                    </div>`;
+                return;
+            }
+
+            playlistContainer.innerHTML = "";
+            playlist.forEach((track, index) => {
+                const item = document.createElement('div');
+                item.className = `track-item ${index === currentIndex ? 'active-track' : ''}`;
+                
+                item.innerHTML = `
+                    <div class="track-item-info" onclick="changeTrack(${index}, true)">
+                        <div class="track-item-title">${track.title}</div>
+                    </div>
+                    <button class="track-item-action-btn" onclick="downloadTrackDirect(${index})" title="Baixar esta faixa">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                `;
+                playlistContainer.appendChild(item);
+            });
+        }
+
+        function changeTrack(index, autoPlay = true) {
+            if (index < 0 || index >= playlist.length) return;
+            
+            currentIndex = index;
+            audioNode.src = playlist[currentIndex].url;
+            currentTrackTitle.innerText = playlist[currentIndex].title;
+            currentTrackIndex.innerText = playlist[currentIndex].artist;
+            
+            renderPlaylistUI();
+
+            if (autoPlay) {
+                playAudio();
+            } else {
+                pauseAudio();
+            }
+        }
+
+        // CONTROLES DE ÁUDIO NATURAIS
+        function togglePlayPause() {
+            if (playlist.length === 0) {
+                showToast("Nenhuma faixa ativa carregada.");
+                return;
+            }
+            if (isPlaying) pauseAudio();
+            else playAudio();
+        }
+
+        function playAudio() {
+            if (playlist.length === 0) return;
+            audioNode.play().then(() => {
+                isPlaying = true;
+                mainPlayIcon.className = "fa-solid fa-pause";
+                discElement.classList.add('playing');
+            }).catch(err => console.log("Aguardando interação do usuário."));
+        }
+
+        function pauseAudio() {
+            audioNode.pause();
+            isPlaying = false;
+            mainPlayIcon.className = "fa-solid fa-play";
+            discElement.classList.remove('playing');
+        }
+
+        function setPlaybackMode(mode) {
+            playbackMode = mode;
+            document.getElementById('modeListBtn').classList.remove('active-mode');
+            document.getElementById('modeShuffleBtn').classList.remove('active-mode');
+            document.getElementById('modeLoopBtn').classList.remove('active-mode');
+
+            if (mode === 'list') {
+                document.getElementById('modeListBtn').classList.add('active-mode');
+                showToast("Modo: Ordem Sequencial ativo");
+            } else if (mode === 'shuffle') {
+                document.getElementById('modeShuffleBtn').classList.add('active-mode');
+                showToast("Modo: Aleatório ativo");
+            } else if (mode === 'loop') {
+                document.getElementById('modeLoopBtn').classList.add('active-mode');
+                showToast("Modo: Repetir Faixa ativo");
+            }
+        }
+
+        function playNext() {
+            if (playlist.length === 0) return;
+
+            if (playbackMode === 'loop') {
+                let nextIdx = currentIndex + 1;
+                if (nextIdx >= playlist.length) nextIdx = 0;
+                changeTrack(nextIdx, isPlaying);
+            } else if (playbackMode === 'shuffle') {
+                let randomIdx = Math.floor(Math.random() * playlist.length);
+                changeTrack(randomIdx, isPlaying);
+            } else {
+                let nextIdx = currentIndex + 1;
+                if (nextIdx >= playlist.length) nextIdx = 0;
+                changeTrack(nextIdx, isPlaying);
+            }
+        }
+
+        function playPrevious() {
+            if (playlist.length === 0) return;
+            
+            if (playbackMode === 'shuffle') {
+                let randomIdx = Math.floor(Math.random() * playlist.length);
+                changeTrack(randomIdx, isPlaying);
+            } else {
+                let prevIdx = currentIndex - 1;
+                if (prevIdx < 0) prevIdx = playlist.length - 1;
+                changeTrack(prevIdx, isPlaying);
+            }
+        }
+
+        // GERENCIAMENTO DE FAVORITOS
+        function toggleFavoriteSong(index, buttonEl) {
+            const song = activeFolderSongsList[index];
+            const foundIdx = favoriteTracks.findIndex(f => f.url === song.url);
+
+            if (foundIdx > -1) {
+                favoriteTracks.splice(foundIdx, 1);
+                buttonEl.classList.remove('active-heart');
+                showToast("Removido dos Favoritos");
+            } else {
+                favoriteTracks.push({
+                    title: song.title,
+                    artist: song.artist,
+                    url: song.url,
+                    filename: song.filename
+                });
+                buttonEl.classList.add('active-heart');
+                showToast("Adicionado às Favoritas!");
+            }
+
+            localStorage.setItem('MJ_Favorites', JSON.stringify(favoriteTracks));
+            updateFavBadge();
+            
+            if (currentActiveOpenFolderIdx === -1) {
+                openFolderContainer(-1);
+            }
+        }
+
+        function updateFavBadge() {
+            favCountBadge.innerText = favoriteTracks.length;
+        }
+        // SISTEMA DE DOWNLOADS EFETIVOS DOS ARQUIVOS (CORRIGIDO PARA CELULAR)
+        function downloadServerFile(url, filename) {
+            showToast("Iniciando download da faixa...");
+            
+            // Faz o download do arquivo em segundo plano para forçar o celular a salvar a mídia
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao buscar o arquivo');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename || "musica_autoplaymj.mp3";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(blobUrl);
+                })
+                .catch(err => {
+                    console.error("Erro no download: ", err);
+                    showToast("Erro ao baixar. Verifique a conexão ou o link.");
+                });
+        }
+
+
+        function downloadTrackDirect(idx) {
+            const track = playlist[idx];
+            downloadServerFile(track.url, `${track.title}.mp3`);
+        }
+
+        function downloadCurrentFolderFull() {
+            if(activeFolderSongsList.length === 0) return;
+            showToast("Baixando Álbum/Pasta Completa...");
+            activeFolderSongsList.forEach((song, i) => {
+                setTimeout(() => {
+                    downloadServerFile(song.url, song.filename);
+                }, i * 500);
+            });
+        }
+
+        function downloadFolderFromSidebar(index, event) {
+            event.stopPropagation();
+            const folder = folderDatabase[index];
+            const targetSongs = playlistManager[folder.key] || [];
+            if(targetSongs.length === 0) return;
+            showToast(`Baixando todas de: ${folder.name}`);
+            targetSongs.forEach((song, i) => {
+                setTimeout(() => {
+                    downloadServerFile(song.url, song.filename);
+                }, i * 500);
+            });
+        }
+
+        // BARRA DE PROGRESSO & TIMERS NATIVOS
+        audioNode.ontimeupdate = function() {
+            if (!audioNode.duration) return;
+            
+            const current = audioNode.currentTime;
+            const total = audioNode.duration;
+            const percentage = (current / total) * 100;
+            
+            progressFill.style.width = `${percentage}%`;
+            timeCurrent.innerText = formatTime(current);
+            timeTotal.innerText = formatTime(total);
+        };
+
+        audioNode.onended = function() {
+            if (playbackMode === 'loop') {
+                audioNode.currentTime = 0;
+                playAudio();
+            } else {
+                playNext();
+            }
+        };
+
+        function seekAudio(event) {
+            if (!audioNode.duration) return;
+            const rect = progressBarBg.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const width = rect.width;
+            const clickPercentage = clickX / width;
+            
+            audioNode.currentTime = clickPercentage * audioNode.duration;
+        }
+
+        function formatTime(secs) {
+            let m = Math.floor(secs / 60);
+            let s = Math.floor(secs % 60);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
