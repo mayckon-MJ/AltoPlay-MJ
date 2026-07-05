@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Auto Play MJ</title>
+    <link rel="manifest" href="./manifest.json">
+    
     
     <!-- Configurações para PWA (Android/iOS) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1317,6 +1319,16 @@
             let s = Math.floor(secs % 60);
             return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
+
+        // Registra o Service Worker para habilitar o PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker ativo com sucesso!', reg.scope))
+            .catch(err => console.log('Falha ao registrar o Service Worker:', err));
+    });
+        }
+        
     </script>
 </body>
 </html>
