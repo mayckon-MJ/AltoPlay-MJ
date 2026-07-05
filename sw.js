@@ -32,18 +32,22 @@ self.addEventListener('activate', (e) => {
 
 // Estratégia de Cache: Serve o que está salvo para carregar instantaneamente,
 // mas busca na rede para atualizar caso o usuário mude o código do index.html.
+
 self.addEventListener('fetch', (e) => {
+  // Ignora chamadas que não são GET (como POST/PUT)
+  if (e.request.method !== 'GET') return;
+
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
-      const fetchPromise = fetch(e.request).then((networkResponse) => {
+      // Se estiver no cache, retorna ele. Se não, busca na rede.
+      return cachedResponse || fetch(e.request).then((networkResponse) => {
+        // Só faz cache de respostas válidas (status 200)
         if (networkResponse.status === 200) {
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, networkResponse.clone()));
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
         }
         return networkResponse;
-      }).catch(() => {
-        // Silencia erros de rede para arquivos de áudio externos
       });
-      return cachedResponse || fetchPromise;
     })
   );
 });
