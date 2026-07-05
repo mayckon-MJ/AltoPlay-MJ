@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -673,6 +674,97 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* BANNER DE INSTALAÇÃO PWA POP-UP */
+        .pwa-install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid var(--vidro-borda);
+            backdrop-filter: var(--vidro-blur);
+            -webkit-backdrop-filter: var(--vidro-blur);
+            padding: 18px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px var(--laranja-glow);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pwa-install-banner.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .pwa-prompt-body {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .pwa-prompt-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: var(--laranja-vivo);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            color: #000;
+            box-shadow: 0 0 10px var(--laranja-glow);
+        }
+
+        .pwa-prompt-text {
+            flex: 1;
+        }
+
+        .pwa-prompt-text h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .pwa-prompt-text p {
+            font-size: 0.78rem;
+            color: #aaa;
+        }
+
+        .pwa-prompt-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .pwa-btn {
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.1s;
+        }
+
+        .pwa-btn:active {
+            transform: scale(0.95);
+        }
+
+        .pwa-btn-cancel {
+            background: rgba(255,255,255,0.08);
+            color: #ccc;
+        }
+
+        .pwa-btn-install {
+            background: var(--laranja-vivo);
+            color: #000;
+            box-shadow: 0 0 10px var(--laranja-glow);
+        }
+
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -697,6 +789,23 @@
     </div>
 
     <div class="toast" id="toastBox">Notificação</div>
+
+    <!-- BANNER DE INSTALAÇÃO PWA -->
+    <div class="pwa-install-banner" id="pwaInstallBanner">
+        <div class="pwa-prompt-body">
+            <div class="pwa-prompt-icon">
+                <i class="fa-solid fa-play"></i>
+            </div>
+            <div class="pwa-prompt-text">
+                <h4>Instalar Auto Play MJ</h4>
+                <p>Adicione o player à tela inicial do seu celular para ouvir suas músicas com mais facilidade.</p>
+            </div>
+        </div>
+        <div class="pwa-prompt-buttons">
+            <button class="pwa-btn pwa-btn-cancel" onclick="dismissPwaPrompt()">Hoje Não</button>
+            <button class="pwa-btn pwa-btn-install" onclick="triggerPwaInstall()">Instalar</button>
+        </div>
+    </div>
 
     <!-- HUD SUPERIOR -->
     <div class="header-player">
@@ -840,6 +949,7 @@
         let isPlaying = false;
         let playbackMode = 'list'; // 'list' | 'shuffle' | 'loop'
         let favoriteTracks = JSON.parse(localStorage.getItem('MJ_Favorites')) || [];
+        let deferredPrompt = null;
 
         const audioNode = new Audio();
 
@@ -861,6 +971,7 @@
         const folderViewCount = document.getElementById('folderViewCount');
         const folderSongsContainer = document.getElementById('folderSongsContainer');
         const favCountBadge = document.getElementById('favCountBadge');
+        const pwaInstallBanner = document.getElementById('pwaInstallBanner');
 
         // DEFINIÇÃO DAS 15 PASTAS DO MENU
         const folderDatabase = [
@@ -950,10 +1061,80 @@
         let currentActiveOpenFolderIdx = null;
         let activeFolderSongsList = [];
 
+        // FUNÇÕES DE PERSISTÊNCIA COMPLETA (ESTADO DO PLAYER)
+        function savePlayerState() {
+            const state = {
+                playlist: playlist,
+                currentIndex: currentIndex,
+                playbackMode: playbackMode,
+                currentTime: audioNode.currentTime
+            };
+            localStorage.setItem('MJ_PlayerState', JSON.stringify(state));
+        }
+
+        function loadPlayerState() {
+            const savedState = localStorage.getItem('MJ_PlayerState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                playlist = state.playlist || [];
+                currentIndex = state.currentIndex !== undefined ? state.currentIndex : -1;
+                playbackMode = state.playbackMode || 'list';
+                
+                updatePlaybackModeUI(playbackMode);
+                renderPlaylistUI();
+
+                if (currentIndex > -1 && playlist[currentIndex]) {
+                    audioNode.src = playlist[currentIndex].url;
+                    currentTrackTitle.innerText = playlist[currentIndex].title;
+                    currentTrackIndex.innerText = playlist[currentIndex].artist;
+                    
+                    audioNode.onloadedmetadata = function() {
+                        audioNode.currentTime = state.currentTime || 0;
+                        audioNode.onloadedmetadata = null;
+                    };
+                }
+            }
+        }
+
+        function updatePlaybackModeUI(mode) {
+            document.getElementById('modeListBtn').classList.remove('active-mode');
+            document.getElementById('modeShuffleBtn').classList.remove('active-mode');
+            document.getElementById('modeLoopBtn').classList.remove('active-mode');
+
+            if (mode === 'list') document.getElementById('modeListBtn').classList.add('active-mode');
+            if (mode === 'shuffle') document.getElementById('modeShuffleBtn').classList.add('active-mode');
+            if (mode === 'loop') document.getElementById('modeLoopBtn').classList.add('active-mode');
+        }
+
+        // CAPTURA DO EVENTO DE INSTALAÇÃO DO PWA
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Exibe o banner pop-up customizado
+            pwaInstallBanner.classList.add('show');
+        });
+
+        function triggerPwaInstall() {
+            if (!deferredPrompt) return;
+            pwaInstallBanner.classList.remove('show');
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuário aceitou a instalação do PWA');
+                }
+                deferredPrompt = null;
+            });
+        }
+
+        function dismissPwaPrompt() {
+            pwaInstallBanner.classList.remove('show');
+        }
+
         // INICIALIZAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
             renderFoldersUI();
             updateFavBadge();
+            loadPlayerState();
         });
 
         function showToast(msg) {
@@ -1052,30 +1233,44 @@
             closeFolderView();
             changeTrack(songIndex, true);
             showToast("Tocando faixas selecionadas da pasta");
+            savePlayerState();
         }
 
-        // CARREGAMENTO MANUAL DE ARQUIVOS BAIXADOS (DO CELULAR)
+        // CARREGAMENTO MANUAL DE ARQUIVOS BAIXADOS (DO CELULAR CONVERTIDO EM BASE64 SEGURO)
         function handleFileSelect(event) {
             const files = event.target.files;
             if (files.length === 0) return;
 
+            let processedCount = 0;
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const fileURL = URL.createObjectURL(file);
-                
-                playlist.push({
-                    title: file.name.replace(/\.[^/.]+$/, ""),
-                    artist: "Arquivo Local Baixado",
-                    url: fileURL,
-                    isLocal: true
-                });
-            }
+                const reader = new FileReader();
 
-            showToast(`${files.length} música(s) adicionada(s) à Fila`);
-            renderPlaylistUI();
+                reader.onload = function(e) {
+                    const dataURL = e.target.result;
+                    
+                    playlist.push({
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        artist: "Arquivo Local Baixado",
+                        url: dataURL,
+                        isLocal: true
+                    });
 
-            if (currentIndex === -1 && playlist.length > 0) {
-                changeTrack(0, true);
+                    processedCount++;
+
+                    if (processedCount === files.length) {
+                        showToast(`${files.length} música(s) salva(s) na Fila permanentemente`);
+                        renderPlaylistUI();
+
+                        if (currentIndex === -1 && playlist.length > 0) {
+                            changeTrack(0, true);
+                        }
+                        savePlayerState();
+                    }
+                };
+
+                reader.readAsDataURL(file);
             }
         }
 
@@ -1120,6 +1315,7 @@
             } else {
                 pauseAudio();
             }
+            savePlayerState();
         }
 
         // CONTROLES DE ÁUDIO NATURAIS
@@ -1146,24 +1342,21 @@
             isPlaying = false;
             mainPlayIcon.className = "fa-solid fa-play";
             discElement.classList.remove('playing');
+            savePlayerState();
         }
 
         function setPlaybackMode(mode) {
             playbackMode = mode;
-            document.getElementById('modeListBtn').classList.remove('active-mode');
-            document.getElementById('modeShuffleBtn').classList.remove('active-mode');
-            document.getElementById('modeLoopBtn').classList.remove('active-mode');
+            updatePlaybackModeUI(mode);
 
             if (mode === 'list') {
-                document.getElementById('modeListBtn').classList.add('active-mode');
                 showToast("Modo: Ordem Sequencial ativo");
             } else if (mode === 'shuffle') {
-                document.getElementById('modeShuffleBtn').classList.add('active-mode');
                 showToast("Modo: Aleatório ativo");
             } else if (mode === 'loop') {
-                document.getElementById('modeLoopBtn').classList.add('active-mode');
                 showToast("Modo: Repetir Faixa ativo");
             }
+            savePlayerState();
         }
 
         function playNext() {
@@ -1227,11 +1420,21 @@
         function updateFavBadge() {
             favCountBadge.innerText = favoriteTracks.length;
         }
+        
         // SISTEMA DE DOWNLOADS EFETIVOS DOS ARQUIVOS (CORRIGIDO PARA CELULAR)
         function downloadServerFile(url, filename) {
+            if (url.startsWith('data:')) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || "musica_local.mp3";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                return;
+            }
+
             showToast("Iniciando download da faixa...");
             
-            // Faz o download do arquivo em segundo plano para forçar o celular a salvar a mídia
             fetch(url)
                 .then(response => {
                     if (!response.ok) throw new Error('Erro ao buscar o arquivo');
@@ -1282,6 +1485,8 @@
             });
         }
 
+        let trackerTimeout = null;
+
         // BARRA DE PROGRESSO & TIMERS NATIVOS
         audioNode.ontimeupdate = function() {
             if (!audioNode.duration) return;
@@ -1293,6 +1498,13 @@
             progressFill.style.width = `${percentage}%`;
             timeCurrent.innerText = formatTime(current);
             timeTotal.innerText = formatTime(total);
+
+            if (!trackerTimeout) {
+                trackerTimeout = setTimeout(() => {
+                    savePlayerState();
+                    trackerTimeout = null;
+                }, 3000);
+            }
         };
 
         audioNode.onended = function() {
@@ -1312,6 +1524,7 @@
             const clickPercentage = clickX / width;
             
             audioNode.currentTime = clickPercentage * audioNode.duration;
+            savePlayerState();
         }
 
         function formatTime(secs) {
@@ -1321,12 +1534,12 @@
         }
 
         // Registra o Service Worker para habilitar o PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker ativo com sucesso!', reg.scope))
-            .catch(err => console.log('Falha ao registrar o Service Worker:', err));
-    });
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker ativo com sucesso!', reg.scope))
+                    .catch(err => console.log('Falha ao registrar o Service Worker:', err));
+            });
         }
         
     </script>
