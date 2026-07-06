@@ -7,7 +7,7 @@
     <title>Auto Play MJ</title>
     <link rel="manifest" href="./manifest.json">
     
-    <!-- Configurações para PWA (Android/i,OS) -->
+    <!-- Configurações para PWA (Android/iOS) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Auto Play MJ">
@@ -554,7 +554,7 @@
         .folder-view-title {
             font-size: 1.2rem;
             font-weight: 600;
-        }
+         }
 
         .folder-view-subtitle {
             font-size: 0.75rem;
@@ -963,6 +963,26 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO BANCO DE DADOS LOCAL (INDEXEDDB) PARA MANTER OS ARQUIVOS VIVOS
+        const dbName = "MJ_AudioPersistentDB";
+        let db = null;
+
+        const dbRequest = indexedDB.open(dbName, 1);
+        dbRequest.onupgradeneeded = function(e) {
+            let database = e.target.result;
+            if (!database.objectStoreNames.contains("audio_files")) {
+                database.createObjectStore("audio_files", { keyPath: "id" });
+            }
+        };
+        dbRequest.onsuccess = function(e) {
+            db = e.target.result;
+            // Executa após a conexão com o banco de dados estar pronta
+            initPlayerPersistence();
+        };
+        dbRequest.onerror = function(e) {
+            console.error("Erro ao abrir banco de dados local IndexedDB", e);
+        };
+
         // LÓGICA DO SPLASH SCREEN
         const splashScreen = document.getElementById('splash-screen');
         const splashPulseElement = document.getElementById('splashPulseElement');
@@ -1021,8 +1041,7 @@
             return color;
         }
 
-        //
-                // FUNÇÕES DE PERSISTÊNCIA COMPLETA
+        // FUNÇÕES DE PERSISTÊNCIA COMPLETA ATUALIZADAS
         function savePlayerState() {
             const state = {
                 playlist: playlist,
@@ -1033,42 +1052,86 @@
                 playedTracksUrls: playedTracksUrls
             };
             localStorage.setItem('MJ_PlayerState', JSON.stringify(state));
-            
-            // REMOVA as músicas com BLOB expirado antes de salvar as pastas no localStorage
-            const foldersToSave = importedFolders.map(folder => {
-                return {
-                    ...folder,
-                    songs: [] // Limpa os links antigos que já deixaram de funcionar
-                };
-            });
-            localStorage.setItem('MJ_ImportedFolders', JSON.stringify(foldersToSave));
+            localStorage.setItem('MJ_ImportedFolders', JSON.stringify(importedFolders));
+            localStorage.setItem('MJ_Favorites', JSON.stringify(favoriteTracks));
         }
 
+        // Nova inicialização síncrona/assíncrona baseada nos arquivos binários reais salvos
+        function initPlayerPersistence() {
+            if (!db) return;
 
-        function loadPlayerState() {
-            const savedState = localStorage.getItem('MJ_PlayerState');
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                playlist = state.playlist || [];
-                currentIndex = state.currentIndex !== undefined ? state.currentIndex : -1;
-                playbackMode = state.playbackMode || 'list';
-                currentActiveFolderName = state.currentActiveFolderName || "";
-                playedTracksUrls = state.playedTracksUrls || [];
-                
-                updatePlaybackModeUI(playbackMode);
-                renderPlaylistUI();
+            // Puxa todos os arquivos de áudio salvos no IndexedDB
+            const transaction = db.transaction(["audio_files"], "readonly");
+            const store = transaction.objectStore("audio_files");
+            const getAllRequest = store.getAll();
 
-                if (currentIndex > -1 && playlist[currentIndex]) {
-                    audioNode.src = playlist[currentIndex].url;
-                    currentTrackTitle.innerText = playlist[currentIndex].title;
-                    currentTrackIndex.innerText = playlist[currentIndex].artist;
+            getAllRequest.onsuccess = function() {
+                const records = getAllRequest.result || [];
+                const blobMap = {};
+
+                // Regenera as URLs de Blob válidas para essa sessão de navegação
+                records.forEach(record => {
+                    try {
+                        blobMap[record.id] = URL.createObjectURL(record.fileData);
+                    } catch (e) {
+                        console.error("Erro ao gerar blob para id " + record.id, e);
+                    }
+                });
+
+                // Re-hidrata os objetos de músicas nas pastas importadas
+                importedFolders.forEach(folder => {
+                    if (folder.songs) {
+                        folder.songs.forEach(song => {
+                            if (song.fileId && blobMap[song.fileId]) {
+                                song.url = blobMap[song.fileId];
+                            }
+                        });
+                    }
+                });
+
+                // Re-hidrata os objetos de músicas nos favoritos
+                favoriteTracks.forEach(song => {
+                    if (song.fileId && blobMap[song.fileId]) {
+                        song.url = blobMap[song.fileId];
+                    }
+                });
+
+                // Restaura o Estado do Player
+                const savedState = localStorage.getItem('MJ_PlayerState');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    playlist = state.playlist || [];
                     
-                    audioNode.onloadedmetadata = function() {
-                        audioNode.currentTime = state.currentTime || 0;
-                        audioNode.onloadedmetadata = null;
-                    };
+                    // Re-hidrata a playlist ativa
+                    playlist.forEach(song => {
+                        if (song.fileId && blobMap[song.fileId]) {
+                            song.url = blobMap[song.fileId];
+                        }
+                    });
+
+                    currentIndex = state.currentIndex !== undefined ? state.currentIndex : -1;
+                    playbackMode = state.playbackMode || 'list';
+                    currentActiveFolderName = state.currentActiveFolderName || "";
+                    playedTracksUrls = state.playedTracksUrls || [];
+                    
+                    updatePlaybackModeUI(playbackMode);
+                    renderPlaylistUI();
+
+                    if (currentIndex > -1 && playlist[currentIndex]) {
+                        audioNode.src = playlist[currentIndex].url;
+                        currentTrackTitle.innerText = playlist[currentIndex].title;
+                        currentTrackIndex.innerText = playlist[currentIndex].artist;
+                        
+                        audioNode.onloadedmetadata = function() {
+                            audioNode.currentTime = state.currentTime || 0;
+                            audioNode.onloadedmetadata = null;
+                        };
+                    }
                 }
-            }
+
+                renderFoldersUI();
+                updateFavBadge();
+            };
         }
 
         function updatePlaybackModeUI(mode) {
@@ -1104,17 +1167,27 @@
             pwaInstallBanner.classList.remove('show');
         }
 
-        // INICIALIZAÇÃO
+        // INICIALIZAÇÃO DO DOM
         window.addEventListener('DOMContentLoaded', () => {
             renderFoldersUI();
             updateFavBadge();
-            loadPlayerState();
+            // A carga de persistência real agora inicia logo que o IndexedDB confirma sucesso.
         });
 
-        // FUNÇÃO ADICIONADA PARA APAGAR A PASTA COMPLETA DO BANCO DE DADOS EM MEMÓRIA
+        // FUNÇÃO ATUALIZADA PARA APAGAR AS MÚSICAS DO INDEXEDDB TAMBÉM
         function deleteWholeFolder(index, event) {
             event.stopPropagation(); // Impede abrir a pasta ao clicar no botão de lixeira
             if(confirm("Tem certeza que deseja apagar esta pasta completa e remover suas músicas?")) {
+                const folder = importedFolders[index];
+                
+                if (folder && folder.songs && db) {
+                    const transaction = db.transaction(["audio_files"], "readwrite");
+                    const store = transaction.objectStore("audio_files");
+                    folder.songs.forEach(song => {
+                        if (song.fileId) store.delete(song.fileId);
+                    });
+                }
+
                 importedFolders.splice(index, 1);
                 renderFoldersUI();
                 savePlayerState();
@@ -1134,7 +1207,7 @@
             else sidebarOverlay.classList.remove('open');
         }
 
-        // ATUALIZA INTERFACE DAS PASTAS NA SIDEBAR (Alterado apenas para colocar o ícone da lixeira)
+        // ATUALIZA INTERFACE DAS PASTAS NA SIDEBAR
         function renderFoldersUI() {
             foldersContainer.innerHTML = "";
             if (importedFolders.length === 0) {
@@ -1167,7 +1240,7 @@
             });
         }
 
-        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS DO DISPOSITIVO
+        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS SALVANDO NO PROPRIO NAVEGADOR NATIVO
         function handleFolderImport(event) {
             const files = event.target.files;
             if (files.length === 0) return;
@@ -1199,6 +1272,15 @@
                 return;
             }
 
+            if (!db) {
+                showToast("O banco de dados do navegador ainda não está pronto. Tente novamente.");
+                return;
+            }
+
+            // Inicia gravação no IndexedDB
+            const transaction = db.transaction(["audio_files"], "readwrite");
+            const store = transaction.objectStore("audio_files");
+
             // Transforma o mapa em nosso banco de dados em memória dinâmico
             folderNames.forEach(name => {
                 const filesList = folderMap[name];
@@ -1210,8 +1292,15 @@
                 };
 
                 filesList.forEach(file => {
+                    // Cria uma ID persistente para linkar a música com o arquivo binário salvo
+                    const uniqueFileId = "track_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
                     const blobURL = URL.createObjectURL(file);
+                    
+                    // Salva o arquivo de mídia nativo real no IndexedDB
+                    store.put({ id: uniqueFileId, fileName: file.name, fileData: file });
+
                     newFolder.songs.push({
+                        fileId: uniqueFileId,
                         title: file.name.replace(/\.[^/.]+$/, ""),
                         artist: name,
                         url: blobURL
@@ -1221,10 +1310,13 @@
                 importedFolders.push(newFolder);
             });
 
-            showToast(`${folderNames.length} pasta(s) carregada(s) com sucesso!`);
-            renderFoldersUI();
-            savePlayerState();
-            toggleSidebar(true);
+            transaction.oncomplete = function() {
+                showToast(`${folderNames.length} pasta(s) carregada(s) com sucesso!`);
+                renderFoldersUI();
+                savePlayerState();
+                toggleSidebar(true);
+            };
+            
             event.target.value = ''; // Limpa o seletor
         }
 
@@ -1252,7 +1344,7 @@
                 folderSongsContainer.innerHTML = `<div style="color:#555; text-align:center; padding-top:40px;">Esta pasta não possui músicas ou arquivos carregados.</div>`;
             } else {
                 activeFolderSongsList.forEach((song, sIdx) => {
-                    const isFav = favoriteTracks.some(f => f.url === song.url);
+                    const isFav = favoriteTracks.some(f => f.fileId === song.fileId || f.url === song.url);
                     const sItem = document.createElement('div');
                     sItem.className = 'server-song-item';
                     sItem.innerHTML = `
@@ -1285,6 +1377,14 @@
                 openFolderContainer(-1);
             } else {
                 const folder = importedFolders[currentActiveOpenFolderIdx];
+                const song = folder.songs[songIndex];
+                
+                // Remove do banco IndexedDB também
+                if (song && song.fileId && db) {
+                    const transaction = db.transaction(["audio_files"], "readwrite");
+                    transaction.objectStore("audio_files").delete(song.fileId);
+                }
+
                 folder.songs.splice(songIndex, 1);
                 renderFoldersUI();
                 openFolderContainer(currentActiveOpenFolderIdx);
@@ -1464,7 +1564,7 @@
         // GERENCIAMENTO DE FAVORITOS
         function toggleFavoriteSong(index, buttonEl) {
             const song = activeFolderSongsList[index];
-            const foundIdx = favoriteTracks.findIndex(f => f.url === song.url);
+            const foundIdx = favoriteTracks.findIndex(f => f.fileId === song.fileId || f.url === song.url);
 
             if (foundIdx > -1) {
                 favoriteTracks.splice(foundIdx, 1);
@@ -1472,6 +1572,7 @@
                 showToast("Removido dos Favoritos");
             } else {
                 favoriteTracks.push({
+                    fileId: song.fileId,
                     title: song.title,
                     artist: song.artist,
                     url: song.url
@@ -1609,3 +1710,4 @@
     </script>
 </body>
 </html>
+
