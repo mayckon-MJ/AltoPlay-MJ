@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -26,23 +27,6 @@
             --vidro-borda: rgba(255, 102, 0, 0.25);
             --vidro-blur: blur(25px);
             --card-bg: rgba(30, 30, 30, 0.45);
-        }
-
-        /* Temas Dinâmicos */
-        body.theme-neon {
-            --laranja-vivo: #00ffcc;
-            --laranja-glow: rgba(0, 255, 204, 0.35);
-            --vidro-borda: rgba(0, 255, 204, 0.25);
-        }
-        body.theme-purple {
-            --laranja-vivo: #9d4edd;
-            --laranja-glow: rgba(157, 78, 221, 0.35);
-            --vidro-borda: rgba(157, 78, 221, 0.25);
-        }
-        body.theme-sunset {
-            --laranja-vivo: #ff007f;
-            --laranja-glow: rgba(255, 0, 127, 0.35);
-            --vidro-borda: rgba(255, 0, 127, 0.25);
         }
 
         * {
@@ -214,9 +198,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 15px 20px;
+            padding: 20px;
             text-align: center;
-            position: relative;
         }
 
         .disc-art {
@@ -229,9 +212,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             transition: transform 0.3s ease;
-            position: relative;
         }
 
         .disc-art.playing {
@@ -241,36 +223,6 @@
         .disc-art i {
             font-size: 2.5rem;
             color: var(--laranja-vivo);
-        }
-
-        /* Equalizador Visual no centro do disco */
-        .eq-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 3px;
-            height: 30px;
-            position: absolute;
-            bottom: 15px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .disc-art.playing .eq-container {
-            opacity: 1;
-        }
-        .eq-bar {
-            width: 3px;
-            height: 5px;
-            background: var(--laranja-vivo);
-            border-radius: 2px;
-        }
-        .disc-art.playing .eq-bar:nth-child(1) { animation: eq-bounce 0.8s ease-in-out infinite alternate; }
-        .disc-art.playing .eq-bar:nth-child(2) { animation: eq-bounce 0.5s ease-in-out infinite alternate 0.2s; }
-        .disc-art.playing .eq-bar:nth-child(3) { animation: eq-bounce 0.9s ease-in-out infinite alternate 0.4s; }
-        .disc-art.playing .eq-bar:nth-child(4) { animation: eq-bounce 0.6s ease-in-out infinite alternate 0.1s; }
-
-        @keyframes eq-bounce {
-            from { height: 5px; }
-            to { height: 25px; }
         }
 
         .track-name {
@@ -287,7 +239,7 @@
         .track-artist {
             font-size:10px;
             color: #888;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         /* BARRA DE PROGRESSO */
@@ -297,7 +249,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .progress-bar-bg {
@@ -328,49 +280,11 @@
             font-family: monospace;
         }
 
-        /* CONTROLE DE VOLUME INTEGRADO */
-        .volume-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            max-width: 200px;
-            margin-bottom: 15px;
-            background: rgba(255,255,255,0.05);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .volume-container i {
-            color: #aaa;
-            font-size: 0.85rem;
-            width: 15px;
-        }
-        .volume-slider {
-            flex: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 5px;
-            outline: none;
-        }
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--laranja-vivo);
-            cursor: pointer;
-        }
-
         /* CONTROLES E SELETORES DE MODO */
         .player-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 20px;
         }
 
         .control-btn {
@@ -405,21 +319,6 @@
             text-shadow: 0 0 10px var(--laranja-vivo);
         }
 
-        /* Velocidade e Sleep no Player */
-        .speed-badge, .timer-badge {
-            font-size: 0.7rem;
-            background: rgba(255,255,255,0.1);
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-        .speed-badge.active, .timer-badge.active {
-            border-color: var(--laranja-vivo);
-            color: var(--laranja-vivo);
-        }
-
         /* FILA DE REPRODUÇÃO - CORRIGIDA E DESTRAVADA */
         .playlist-section {
             height: 38%;
@@ -429,15 +328,8 @@
             -webkit-backdrop-filter: var(--vidro-blur);
             display: flex;
             flex-direction: column;
-            padding: 8px;
+            padding: 1px 1px;
             z-index: 5;
-        }
-
-        .playlist-header-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 8px;
         }
 
         .playlist-header {
@@ -445,21 +337,7 @@
             color: #666;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-align: center;
-        }
-
-        .search-bar-input {
-            width: 100%;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.85rem;
-            outline: none;
-        }
-        .search-bar-input:focus {
-            border-color: var(--laranja-vivo);
+            margin-bottom: 12px;
         }
 
         .tracks-list {
@@ -585,22 +463,6 @@
             cursor: pointer;
         }
 
-        /* Interface Seletora de Temas */
-        .theme-selector-box {
-            padding: 10px 15px;
-            display: flex;
-            gap: 10px;
-            justify-content: space-around;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .theme-dot {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #fff;
-        }
-
         .folders-container {
             flex: 1;
             overflow-y: auto;
@@ -677,18 +539,11 @@
         }
 
         .folder-view-header {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255,102,0,0.2);
-        }
-
-        .folder-view-header-top {
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
+            border-bottom: 1px solid rgba(255,102,0,0.2);
         }
 
         .folder-view-title-area {
@@ -884,41 +739,6 @@
             box-shadow: 0 0 10px var(--laranja-glow);
         }
 
-        /* Janela Expansível do Gatinho de Vídeo */
-        .cat-video-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 500;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .cat-video-overlay.open {
-            display: flex;
-        }
-        .cat-video-fullscreen {
-            width: 100%;
-            max-height: 80%;
-            object-fit: contain;
-        }
-        .cat-close-btn {
-            position: absolute;
-            top: 30px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -944,7 +764,7 @@
             <img class="splash-img-pulse" src="https://i.ibb.co/7xVkr2V4/120448.png" alt="Logo 2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
             <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
         </div>
-        <div class="splash-brand-name">Auto Play MJ</div>
+        <div class="splash-brand-name">Alto Play MJ</div>
     </div>
 
     <script>
@@ -1003,13 +823,6 @@
     <div class="now-playing-section">
         <div class="disc-art" id="discElement">
             <i class="fa-solid fa-compact-disc"></i>
-            <!-- Equalizador Visual -->
-            <div class="eq-container">
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-            </div>
         </div>
         <div class="track-name" id="currentTrackTitle">Nenhuma música na fila</div>
         <div class="track-artist" id="currentTrackIndex">Abra o menu ou adicione mídias</div>
@@ -1025,24 +838,12 @@
             </div>
         </div>
 
-        <!-- CONTROLADORES DE ÁUDIO EXTRAS (Velocidade e Sleep) -->
-        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-            <span class="speed-badge" id="speedBadgeBtn" onclick="cycleSpeed()">1.0x</span>
-            <span class="timer-badge" id="sleepTimerBtn" onclick="setSleepTimerPrompt()"><i class="fa-solid fa-moon"></i> Off</span>
-        </div>
-
-        <!-- BARRA DE VOLUME -->
-        <div class="volume-container">
-            <i class="fa-solid fa-volume-high" id="volumeIcon" onclick="toggleMute()"></i>
-            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)">
-        </div>
-
         <!-- CONTROLES -->
         <div class="player-controls">
             <div style="display: inline-flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
-                <div onclick="openCatVideoFullscreen()" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,102,0,0.3);">
-                    <video id="catWidgetPreview" src="GatinhoDancando.mp4" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
-                </div>
+                <a href="#" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 12px; overflow: hidden; position: relative; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,102,0,0.3);">
+                    <video src="GatinhoDancando.mp4" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+                </a>
                 <p style="margin: 0; font-size: 8px; font-family: sans-serif; color: #fff; font-weight: bold;">Clique no Gatinho</p>
             </div>
             
@@ -1066,18 +867,9 @@
         </div>
     </div>
 
-    <!-- EXPANSÃO DO VÍDEO DO GATINHO -->
-    <div class="cat-video-overlay" id="catVideoOverlay">
-        <button class="cat-close-btn" onclick="closeCatVideoFullscreen()">Fechar X</button>
-        <video id="catFullscreenVideo" src="GatinhoDancando.mp4" loop playsinline style="width:100%; max-height:80%; object-fit:contain;"></video>
-    </div>
-
     <!-- LISTA DE REPRODUÇÃO -->
     <div class="playlist-section">
-        <div class="playlist-header-wrapper">
-            <div class="playlist-header">Ordem de reprodução</div>
-            <input type="text" class="search-bar-input" id="playlistSearch" placeholder="Pesquisar na fila..." oninput="filterPlaylistUI()">
-        </div>
+        <div class="playlist-header" style="text-align:center;">Ordem de reprodução</div>
         <div class="tracks-list" id="playlistContainer">
             <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
                 Fila vazia. Importe uma pasta no botão superior.
@@ -1095,15 +887,7 @@
                 </button>              
             </div>
 
-            <!-- Alteração de Temas Dinâmicos Visuais -->
-            <div class="theme-selector-box">
-                <div class="theme-dot" style="background:#ff6600;" onclick="changeAppTheme('default')"></div>
-                <div class="theme-dot" style="background:#00ffcc;" onclick="changeAppTheme('neon')"></div>
-                <div class="theme-dot" style="background:#9d4edd;" onclick="changeAppTheme('purple')"></div>
-                <div class="theme-dot" style="background:#ff007f;" onclick="changeAppTheme('sunset')"></div>
-            </div>
-
-            <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3399ff20,#3399ff35);color:#66bbff;padding:14px 18px;border-radius:18px;font-size:0.95rem;font-weight:700;border:1px solid rgba(102,187,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.15);margin:10px;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3399ff20,#3399ff35);color:#66bbff;padding:14px 18px;border-radius:18px;font-size:0.95rem;font-weight:700;border:1px solid rgba(102,187,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.15);">
                 <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
                 <span style="font-size: 13px;">Suas Pastas Importadas</span>
                 <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
@@ -1132,18 +916,15 @@
     <!-- TELA DA PASTA SELECIONADA -->
     <div class="folder-view-overlay" id="folderViewOverlay">
         <div class="folder-view-header">
-            <div class="folder-view-header-top">
-                <div class="folder-view-title-area">
-                    <div class="folder-view-title" id="folderViewTitle">Nome da Pasta</div>
-                    <div class="folder-view-subtitle" id="folderViewCount">0 músicas disponíveis</div>
-                </div>
-                <div class="folder-view-actions">
-                    <button class="close-sidebar-btn" onclick="closeFolderView()">
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-                </div>
+            <div class="folder-view-title-area">
+                <div class="folder-view-title" id="folderViewTitle">Nome da Pasta</div>
+                <div class="folder-view-subtitle" id="folderViewCount">0 músicas disponíveis</div>
             </div>
-            <input type="text" class="search-bar-input" id="folderSongsSearch" placeholder="Pesquisar nesta pasta..." oninput="filterFolderSongsUI()">
+            <div class="folder-view-actions">
+                <button class="close-sidebar-btn" onclick="closeFolderView()">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
         </div>
         <div class="folder-songs-list" id="folderSongsContainer">
             <!-- Músicas da pasta selecionada -->
@@ -1155,15 +936,13 @@
         const splashScreen = document.getElementById('splash-screen');
         const splashPulseElement = document.getElementById('splashPulseElement');
 
-        if (splashPulseElement) {
-            splashPulseElement.addEventListener('animationend', () => {
-                splashScreen.style.opacity = '0';
-                splashScreen.style.pointerEvents = 'none';
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                }, 500);
-            });
-        }
+        splashPulseElement.addEventListener('animationend', () => {
+            splashScreen.style.opacity = '0';
+            splashScreen.style.pointerEvents = 'none';
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 500);
+        });
 
         // CONFIGURAÇÕES E ESTADOS
         let playlist = [];
@@ -1171,12 +950,8 @@
         let isPlaying = false;
         let playbackMode = 'list';
         let favoriteTracks = JSON.parse(localStorage.getItem('MJ_Favorites')) || [];
-        let importedFolders = JSON.parse(localStorage.getItem('MJ_StoredFolders')) || []; 
-        let currentTheme = localStorage.getItem('MJ_Theme') || 'default';
+        let importedFolders = []; 
         let deferredPrompt = null;
-        let sleepTimerTimeout = null;
-        let currentPlaybackRate = 1.0;
-        let lastVolumeLevel = 1.0;
 
         const audioNode = new Audio();
 
@@ -1199,14 +974,6 @@
         const folderSongsContainer = document.getElementById('folderSongsContainer');
         const favCountBadge = document.getElementById('favCountBadge');
         const pwaInstallBanner = document.getElementById('pwaInstallBanner');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const volumeIcon = document.getElementById('volumeIcon');
-        const speedBadgeBtn = document.getElementById('speedBadgeBtn');
-        const sleepTimerBtn = document.getElementById('sleepTimerBtn');
-        const playlistSearch = document.getElementById('playlistSearch');
-        const folderSongsSearch = document.getElementById('folderSongsSearch');
-        const catVideoOverlay = document.getElementById('catVideoOverlay');
-        const catFullscreenVideo = document.getElementById('catFullscreenVideo');
 
         // Função auxiliar para gerar cores aleatórias para as pastas
         function getRandomColor() {
@@ -1216,90 +983,6 @@
                 color += letters[Math.floor(Math.random() * 16)];
             }
             return color;
-        }
-
-        // ALTERAÇÃO DO TEMA VISUAL DO SISTEMA
-        function changeAppTheme(theme) {
-            document.body.className = '';
-            if (theme !== 'default') {
-                document.body.classList.add('theme-' + theme);
-            }
-            currentTheme = theme;
-            localStorage.setItem('MJ_Theme', theme);
-            showToast("Tema visual atualizado!");
-        }
-
-        // CONTROLE DE VELOCIDADE (PLAYBACK RATE)
-        function cycleSpeed() {
-            if (currentPlaybackRate === 1.0) currentPlaybackRate = 1.5;
-            else if (currentPlaybackRate === 1.5) currentPlaybackRate = 2.0;
-            else if (currentPlaybackRate === 2.0) currentPlaybackRate = 0.5;
-            else currentPlaybackRate = 1.0;
-
-            audioNode.playbackRate = currentPlaybackRate;
-            speedBadgeBtn.innerText = currentPlaybackRate + "x";
-            if(currentPlaybackRate !== 1.0) speedBadgeBtn.classList.add('active');
-            else speedBadgeBtn.classList.remove('active');
-            showToast("Velocidade: " + currentPlaybackRate + "x");
-        }
-
-        // CONTROLE DE SLEEP TIMER (TEMPORIZADOR)
-        function setSleepTimerPrompt() {
-            const mins = prompt("Em quantos minutos deseja desligar o som de reprodução automaticamente? (Deixe em branco ou digite 0 para cancelar)");
-            if (sleepTimerTimeout) clearTimeout(sleepTimerTimeout);
-
-            if (!mins || parseInt(mins) <= 0 || isNaN(mins)) {
-                sleepTimerBtn.innerHTML = `<i class="fa-solid fa-moon"></i> Off`;
-                sleepTimerBtn.classList.remove('active');
-                showToast("Temporizador canceled.");
-                return;
-            }
-
-            sleepTimerBtn.innerHTML = `<i class="fa-solid fa-moon"></i> ${mins}m`;
-            sleepTimerBtn.classList.add('active');
-            showToast("O sistema desligará em " + mins + " minutos.");
-
-            sleepTimerTimeout = setTimeout(() => {
-                pauseAudio();
-                sleepTimerBtn.innerHTML = `<i class="fa-solid fa-moon"></i> Off`;
-                sleepTimerBtn.classList.remove('active');
-                showToast("Temporizador concluído. Som pausado.");
-            }, parseInt(mins) * 60 * 1000);
-        }
-
-        // CONTROLE DE AUDIO E MUTE VIA SLIDER
-        function changeVolume(val) {
-            audioNode.volume = val;
-            if (val == 0) {
-                volumeIcon.className = "fa-solid fa-volume-xmark";
-            } else if (val < 0.5) {
-                volumeIcon.className = "fa-solid fa-volume-low";
-            } else {
-                volumeIcon.className = "fa-solid fa-volume-high";
-            }
-        }
-
-        function toggleMute() {
-            if (audioNode.volume > 0) {
-                lastVolumeLevel = audioNode.volume;
-                volumeSlider.value = 0;
-                changeVolume(0);
-            } else {
-                volumeSlider.value = lastVolumeLevel;
-                changeVolume(lastVolumeLevel);
-            }
-        }
-
-        // EXPANSÃO INTERATIVA DO PLAYER DO GATINHO
-        function openCatVideoFullscreen() {
-            catVideoOverlay.classList.add('open');
-            catFullscreenVideo.muted = false;
-            catFullscreenVideo.play().catch(() => {});
-        }
-
-        function closeCatVideoFullscreen() {
-            catFullscreenVideo.pause();
-            catVideoOverlay.classList.remove('open');
         }
 
         // FUNÇÕES DE PERSISTÊNCIA COMPLETA
@@ -1331,10 +1014,8 @@
                     
                     audioNode.onloadedmetadata = function() {
                         audioNode.currentTime = state.currentTime || 0;
-                        audioNode.playbackRate = currentPlaybackRate;
                         audioNode.onloadedmetadata = null;
                     };
-                    updateMediaSession();
                 }
             }
         }
@@ -1374,79 +1055,16 @@
 
         // INICIALIZAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
-            changeAppTheme(currentTheme);
             renderFoldersUI();
             updateFavBadge();
             loadPlayerState();
-            setupAccelerometer();
-            setupMediaSessionHandlers();
         });
-
-        // MECANISMO DE ACELERÔMETRO: SHAKE TO PLAY NEXT
-        function setupAccelerometer() {
-            if ('LinearAccelerationSensor' in window) {
-                try {
-                    let sensor = new LinearAccelerationSensor({frequency: 60});
-                    sensor.addEventListener('reading', () => {
-                        let magnitude = Math.sqrt(sensor.x*sensor.x + sensor.y*sensor.y + sensor.z*sensor.z);
-                        if (magnitude > 15) { 
-                            playNext();
-                            showToast("Aparelho sacudido: Próxima faixa!");
-                        }
-                    });
-                    sensor.start();
-                } catch(err) { console.log("Erro ao iniciar acelerômetro nativo:", err); }
-            } else {
-                let lastX = null, lastY = null, lastZ = null;
-                let moveThreshold = 15; 
-                window.addEventListener('devicemotion', (event) => {
-                    let acceleration = event.accelerationIncludingGravity;
-                    if(!acceleration) return;
-                    if (lastX === null) {
-                        lastX = acceleration.x; lastY = acceleration.y; lastZ = acceleration.z;
-                        return;
-                    }
-                    let deltaX = Math.abs(lastX - acceleration.x);
-                    let deltaY = Math.abs(lastY - acceleration.y);
-                    let deltaZ = Math.abs(lastZ - acceleration.z);
-                    if ((deltaX > moveThreshold && deltaY > moveThreshold) || (deltaX > moveThreshold && deltaZ > moveThreshold)) {
-                        playNext();
-                        showToast("Aparelho movido: Próxima faixa!");
-                    }
-                    lastX = acceleration.x; lastY = acceleration.y; lastZ = acceleration.z;
-                });
-            }
-        }
-
-        // INTEGRACAO MEDIA SESSION API (CONTROLES DE TELA DE BLOQUEIO)
-        function updateMediaSession() {
-            if ('mediaSession' in navigator && currentIndex > -1 && playlist[currentIndex]) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: playlist[currentIndex].title,
-                    artist: playlist[currentIndex].artist,
-                    album: 'Auto Play MJ Folder',
-                    artwork: [
-                        { src: 'https://i.ibb.co/WJB55vX/119623.png', sizes: '512x512', type: 'image/png' }
-                    ]
-                });
-            }
-        }
-
-        function setupMediaSessionHandlers() {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.setActionHandler('play', () => playAudio());
-                navigator.mediaSession.setActionHandler('pause', () => pauseAudio());
-                navigator.mediaSession.setActionHandler('previoustrack', () => playPrevious());
-                navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
-            }
-        }
 
         // FUNÇÃO ADICIONADA PARA APAGAR A PASTA COMPLETA DO BANCO DE DADOS EM MEMÓRIA
         function deleteWholeFolder(index, event) {
             event.stopPropagation(); // Impede abrir a pasta ao clicar no botão de lixeira
             if(confirm("Tem certeza que deseja apagar esta pasta completa e remover suas músicas?")) {
                 importedFolders.splice(index, 1);
-                localStorage.setItem('MJ_StoredFolders', JSON.stringify(importedFolders));
                 renderFoldersUI();
                 showToast("Pasta apagada com sucesso!");
             }
@@ -1497,96 +1115,64 @@
             });
         }
 
-        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS DO DISPOSITIVO - CORRIGIDO SEM ASYNC/PROMISE
+        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS DO DISPOSITIVO
         function handleFolderImport(event) {
             const files = event.target.files;
-            if (!files || files.length === 0) return;
+            if (files.length === 0) return;
 
             const folderMap = {};
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 
+                // Valida se o arquivo é de áudio pelas extensões comuns
                 if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|ogg|m4a|aac|flac)$/i)) {
                     continue;
                 }
 
+                // Identifica a estrutura de pastas nativa pela propriedade relativePath ou webkitRelativePath
                 let pathParts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [];
                 let folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : "Pasta Importada";
 
                 if (!folderMap[folderName]) {
                     folderMap[folderName] = [];
                 }
+
                 folderMap[folderName].push(file);
             }
 
             const folderNames = Object.keys(folderMap);
             if (folderNames.length === 0) {
-                showToast("Nenhum arquivo de áudio válido foi encontrado.");
+                showToast("Nenhum arquivo de áudio válido foi encontrado na pasta selecionada.");
                 return;
             }
 
-            // Variáveis globais de controle para a execução em cascata das leituras de arquivo
-            let currentFolderIdx = 0;
-            let currentFileIdx = 0;
-            let currentFolderObject = null;
+            // Transforma o mapa em nosso banco de dados em memória dinâmico
+            folderNames.forEach(name => {
+                const filesList = folderMap[name];
+                const newFolder = {
+                    id: Date.now() + Math.random(),
+                    name: name,
+                    color: getRandomColor(),
+                    songs: []
+                };
 
-            function processNextFile() {
-                if (currentFolderIdx >= folderNames.length) {
-                    // Finalizou o processamento de todas as pastas importadas
-                    localStorage.setItem('MJ_StoredFolders', JSON.stringify(importedFolders));
-                    showToast(`${folderNames.length} pasta(s) salvas com sucesso!`);
-                    renderFoldersUI();
-                    toggleSidebar(true);
-                    event.target.value = ''; 
-                    return;
-                }
-
-                const folderName = folderNames[currentFolderIdx];
-                const filesList = folderMap[folderName];
-
-                if (!currentFolderObject) {
-                    currentFolderObject = {
-                        id: Date.now() + Math.random(),
-                        name: folderName,
-                        color: getRandomColor(),
-                        songs: []
-                    };
-                }
-
-                if (currentFileIdx >= filesList.length) {
-                    // Finalizou a pasta atual, insere e passa para a próxima
-                    importedFolders.push(currentFolderObject);
-                    currentFolderObject = null;
-                    currentFileIdx = 0;
-                    currentFolderIdx++;
-                    processNextFile();
-                    return;
-                }
-
-                const file = filesList[currentFileIdx];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    currentFolderObject.songs.push({
+                filesList.forEach(file => {
+                    const blobURL = URL.createObjectURL(file);
+                    newFolder.songs.push({
                         title: file.name.replace(/\.[^/.]+$/, ""),
-                        artist: folderName,
-                        url: e.target.result
+                        artist: name,
+                        url: blobURL
                     });
+                });
 
-                    currentFileIdx++;
-                    processNextFile(); // Cascata para o próximo arquivo de maneira síncrona/ordenada
-                };
+                importedFolders.push(newFolder);
+            });
 
-                reader.onerror = function() {
-                    currentFileIdx++;
-                    processNextFile(); 
-                };
-
-                reader.readAsDataURL(file);
-            }
-
-            processNextFile();
+            showToast(`${folderNames.length} pasta(s) carregada(s) com sucesso!`);
+            renderFoldersUI();
+            toggleSidebar(true);
+            event.target.value = ''; // Limpa o seletor
         }
 
         let currentActiveOpenFolderIdx = null;
@@ -1596,7 +1182,7 @@
         function openFolderContainer(index) {
             toggleSidebar(false);
             currentActiveOpenFolderIdx = index;
-            folderSongsSearch.value = ""; 
+            folderSongsContainer.innerHTML = "";
 
             if (index === -1) {
                 folderViewTitle.innerText = "Músicas Favoritas";
@@ -1607,35 +1193,25 @@
                 activeFolderSongsList = folder.songs || [];
             }
 
-            renderFolderSongsListUI(activeFolderSongsList);
-            folderViewOverlay.classList.add('open');
-        }
+            folderViewCount.innerText = `${activeFolderSongsList.length} faixas encontradas`;
 
-        function renderFolderSongsListUI(listToRender) {
-            folderSongsContainer.innerHTML = "";
-            folderViewCount.innerText = `${listToRender.length} faixas encontradas`;
-
-            if(listToRender.length === 0) {
-                folderSongsContainer.innerHTML = `<div style="color:#555; text-align:center; padding-top:40px;">Nenhuma música encontrada nesta busca.</div>`;
+            if(activeFolderSongsList.length === 0) {
+                folderSongsContainer.innerHTML = `<div style="color:#555; text-align:center; padding-top:40px;">Esta pasta não possui músicas ou arquivos carregados.</div>`;
             } else {
-                listToRender.forEach((song, sIdx) => {
-                    const isFav = favoriteTracks.some(f => f.title === song.title);
+                activeFolderSongsList.forEach((song, sIdx) => {
+                    const isFav = favoriteTracks.some(f => f.url === song.url);
                     const sItem = document.createElement('div');
                     sItem.className = 'server-song-item';
-                    
-                    // Encontra o index real dentro do array principal (para o caso de listas filtradas)
-                    const realIdx = activeFolderSongsList.findIndex(x => x.title === song.title);
-
                     sItem.innerHTML = `
-                        <div class="server-song-info" onclick="loadServerTrackToPlaylist(${realIdx})">
+                        <div class="server-song-info" onclick="loadServerTrackToPlaylist(${sIdx})">
                             <div class="server-song-title">${song.title}</div>
                             <div class="server-song-sub">${song.artist}</div>
                         </div>
                         <div class="server-song-controls">
-                            <button class="heart-btn ${isFav ? 'active-heart' : ''}" onclick="toggleFavoriteSong(${realIdx}, this)">
+                            <button class="heart-btn ${isFav ? 'active-heart' : ''}" onclick="toggleFavoriteSong(${sIdx}, this)">
                                 <i class="fa-solid fa-heart"></i>
                             </button>
-                            <button class="track-item-action-btn" onclick="removeTrackFromFolder(${realIdx}, event)" style="color: #ff3333; margin-left: 5px;" title="Excluir música">
+                            <button class="track-item-action-btn" onclick="removeTrackFromFolder(${sIdx}, event)" style="color: #ff3333; margin-left: 5px;" title="Excluir música">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
@@ -1643,17 +1219,8 @@
                     folderSongsContainer.appendChild(sItem);
                 });
             }
-        }
 
-        // BARRA DE PESQUISA INTERNA DA PASTA SELECIONADA
-        function filterFolderSongsUI() {
-            const query = folderSongsSearch.value.toLowerCase().trim();
-            if(!query) {
-                renderFolderSongsListUI(activeFolderSongsList);
-                return;
-            }
-            const filtered = activeFolderSongsList.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-            renderFolderSongsListUI(filtered);
+            folderViewOverlay.classList.add('open');
         }
 
         function removeTrackFromFolder(songIndex, event) {
@@ -1666,7 +1233,6 @@
             } else {
                 const folder = importedFolders[currentActiveOpenFolderIdx];
                 folder.songs.splice(songIndex, 1);
-                localStorage.setItem('MJ_StoredFolders', JSON.stringify(importedFolders));
                 renderFoldersUI();
                 openFolderContainer(currentActiveOpenFolderIdx);
             }
@@ -1687,9 +1253,7 @@
             savePlayerState();
         }
 
-        function renderPlaylistUI(listToRender = null) {
-            const targetList = listToRender || playlist;
-
+        function renderPlaylistUI() {
             if (playlist.length === 0) {
                 playlistContainer.innerHTML = `
                     <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
@@ -1699,36 +1263,22 @@
             }
 
             playlistContainer.innerHTML = "";
-            targetList.forEach((track) => {
-                // Localiza o index original real da música
-                const originalIndex = playlist.findIndex(t => t.title === track.title && t.url === track.url);
-
+            playlist.forEach((track, index) => {
                 const item = document.createElement('div');
-                item.className = `track-item ${originalIndex === currentIndex ? 'active-track' : ''}`;
+                item.className = `track-item ${index === currentIndex ? 'active-track' : ''}`;
                 
                 item.innerHTML = `
-                    <div class="track-item-info" onclick="changeTrack(${originalIndex}, true)">
+                    <div class="track-item-info" onclick="changeTrack(${index}, true)">
                         <div class="track-item-title">${track.title}</div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 5px;">
-                        <button class="track-item-action-btn" onclick="removeTrackFromPlaylist(${originalIndex}, event)" style="color: #ff3333;" title="Remover da fila">
+                        <button class="track-item-action-btn" onclick="removeTrackFromPlaylist(${index}, event)" style="color: #ff3333;" title="Remover da fila">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 `;
                 playlistContainer.appendChild(item);
             });
-        }
-
-        // FILTRO DE BUSCA DA FILA DE REPRODUÇÃO (PLAYLIST PRINCIPAL)
-        function filterPlaylistUI() {
-            const query = playlistSearch.value.toLowerCase().trim();
-            if(!query) {
-                renderPlaylistUI();
-                return;
-            }
-            const filtered = playlist.filter(t => t.title.toLowerCase().includes(query));
-            renderPlaylistUI(filtered);
         }
 
         function removeTrackFromPlaylist(index, event) {
@@ -1771,7 +1321,6 @@
                 pauseAudio();
             }
             savePlayerState();
-            updateMediaSession();
         }
 
         // CONTROLES DE ÁUDIO NATURAIS
@@ -1790,8 +1339,6 @@
                 isPlaying = true;
                 mainPlayIcon.className = "fa-solid fa-pause";
                 discElement.classList.add('playing');
-                audioNode.playbackRate = currentPlaybackRate; 
-                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
             }).catch(err => console.log("Aguardando interação do usuário."));
         }
 
@@ -1800,7 +1347,6 @@
             isPlaying = false;
             mainPlayIcon.className = "fa-solid fa-play";
             discElement.classList.remove('playing');
-            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
             savePlayerState();
         }
 
@@ -1852,7 +1398,7 @@
         // GERENCIAMENTO DE FAVORITOS
         function toggleFavoriteSong(index, buttonEl) {
             const song = activeFolderSongsList[index];
-            const foundIdx = favoriteTracks.findIndex(f => f.title === song.title);
+            const foundIdx = favoriteTracks.findIndex(f => f.url === song.url);
 
             if (foundIdx > -1) {
                 favoriteTracks.splice(foundIdx, 1);
