@@ -944,7 +944,7 @@
             <img class="splash-img-pulse" src="https://i.ibb.co/7xVkr2V4/120448.png" alt="Logo 2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
             <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
         </div>
-        <div class="splash-brand-name">Alto Play MJ</div>
+        <div class="splash-brand-name">Auto Play MJ</div>
     </div>
 
     <script>
@@ -1155,13 +1155,15 @@
         const splashScreen = document.getElementById('splash-screen');
         const splashPulseElement = document.getElementById('splashPulseElement');
 
-        splashPulseElement.addEventListener('animationend', () => {
-            splashScreen.style.opacity = '0';
-            splashScreen.style.pointerEvents = 'none';
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-            }, 500);
-        });
+        if (splashPulseElement) {
+            splashPulseElement.addEventListener('animationend', () => {
+                splashScreen.style.opacity = '0';
+                splashScreen.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 500);
+            });
+        }
 
         // CONFIGURAÇÕES E ESTADOS
         let playlist = [];
@@ -1249,7 +1251,7 @@
             if (!mins || parseInt(mins) <= 0 || isNaN(mins)) {
                 sleepTimerBtn.innerHTML = `<i class="fa-solid fa-moon"></i> Off`;
                 sleepTimerBtn.classList.remove('active');
-                showToast("Temporizador cancelado.");
+                showToast("Temporizador canceled.");
                 return;
             }
 
@@ -1495,79 +1497,96 @@
             });
         }
 
-        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS DO DISPOSITIVO
+        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS DO DISPOSITIVO - CORRIGIDO SEM ASYNC/PROMISE
         function handleFolderImport(event) {
             const files = event.target.files;
-            if (files.length === 0) return;
+            if (!files || files.length === 0) return;
 
             const folderMap = {};
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 
-                // Valida se o arquivo é de áudio pelas extensões comuns
                 if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|ogg|m4a|aac|flac)$/i)) {
                     continue;
                 }
 
-                // Identifica a estrutura de pastas nativa pela propriedade relativePath ou webkitRelativePath
                 let pathParts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [];
                 let folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : "Pasta Importada";
 
                 if (!folderMap[folderName]) {
                     folderMap[folderName] = [];
                 }
-
                 folderMap[folderName].push(file);
             }
 
             const folderNames = Object.keys(folderMap);
             if (folderNames.length === 0) {
-                showToast("Nenhum arquivo de áudio válido foi encontrado na pasta selecionada.");
+                showToast("Nenhum arquivo de áudio válido foi encontrado.");
                 return;
             }
 
-            // Leitores assíncronos convertidos em base64/Blobs estruturados de forma sequencial
-            let foldersProcessed = 0;
+            // Variáveis globais de controle para a execução em cascata das leituras de arquivo
+            let currentFolderIdx = 0;
+            let currentFileIdx = 0;
+            let currentFolderObject = null;
 
-            folderNames.forEach(name => {
-                const filesList = folderMap[name];
-                const newFolder = {
-                    id: Date.now() + Math.random(),
-                    name: name,
-                    color: getRandomColor(),
-                    songs: []
+            function processNextFile() {
+                if (currentFolderIdx >= folderNames.length) {
+                    // Finalizou o processamento de todas as pastas importadas
+                    localStorage.setItem('MJ_StoredFolders', JSON.stringify(importedFolders));
+                    showToast(`${folderNames.length} pasta(s) salvas com sucesso!`);
+                    renderFoldersUI();
+                    toggleSidebar(true);
+                    event.target.value = ''; 
+                    return;
+                }
+
+                const folderName = folderNames[currentFolderIdx];
+                const filesList = folderMap[folderName];
+
+                if (!currentFolderObject) {
+                    currentFolderObject = {
+                        id: Date.now() + Math.random(),
+                        name: folderName,
+                        color: getRandomColor(),
+                        songs: []
+                    };
+                }
+
+                if (currentFileIdx >= filesList.length) {
+                    // Finalizou a pasta atual, insere e passa para a próxima
+                    importedFolders.push(currentFolderObject);
+                    currentFolderObject = null;
+                    currentFileIdx = 0;
+                    currentFolderIdx++;
+                    processNextFile();
+                    return;
+                }
+
+                const file = filesList[currentFileIdx];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    currentFolderObject.songs.push({
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        artist: folderName,
+                        url: e.target.result
+                    });
+
+                    currentFileIdx++;
+                    processNextFile(); // Cascata para o próximo arquivo de maneira síncrona/ordenada
                 };
 
-                let filesProcessed = 0;
+                reader.onerror = function() {
+                    currentFileIdx++;
+                    processNextFile(); 
+                };
 
-                filesList.forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        newFolder.songs.push({
-                            title: file.name.replace(/\.[^/.]+$/, ""),
-                            artist: name,
-                            url: e.target.result // Salva como String Base64 persistente para o LocalStorage
-                        });
+                reader.readAsDataURL(file);
+            }
 
-                        filesProcessed++;
-                        if(filesProcessed === filesList.length) {
-                            importedFolders.push(newFolder);
-                            foldersProcessed++;
-                            
-                            if(foldersProcessed === folderNames.length) {
-                                localStorage.setItem('MJ_StoredFolders', JSON.stringify(importedFolders));
-                                showToast(`${folderNames.length} pasta(s) salvas de forma persistente!`);
-                                renderFoldersUI();
-                                toggleSidebar(true);
-                            }
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
-
-            event.target.value = ''; // Limpa o seletor
+            processNextFile();
         }
 
         let currentActiveOpenFolderIdx = null;
