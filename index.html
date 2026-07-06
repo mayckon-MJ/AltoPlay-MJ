@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -171,11 +172,11 @@
         }
 
         .brand-name {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            background: linear-gradient(to right, #ffffff, #ff9900);
+            background: linear-gradient(to right, #d46a13, #ff9900);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -210,8 +211,8 @@
         }
 
         .disc-art {
-            width: 170px;
-            height: 170px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: var(--vidro-bg);
             border: 3px solid var(--laranja-vivo);
@@ -228,12 +229,12 @@
         }
 
         .disc-art i {
-            font-size: 4.5rem;
+            font-size: 2.5rem;
             color: var(--laranja-vivo);
         }
 
         .track-name {
-            font-size: 1.2rem;
+            font-size: 1.0rem;
             font-weight: 500;
             margin-bottom: 4px;
             padding: 0 15px;
@@ -244,7 +245,7 @@
         }
 
         .track-artist {
-            font-size: 0.85rem;
+            font-size:10px;
             color: #888;
             margin-bottom: 20px;
         }
@@ -335,7 +336,7 @@
             -webkit-backdrop-filter: var(--vidro-blur);
             display: flex;
             flex-direction: column;
-            padding: 15px 20px;
+            padding: 1px 1px;
             z-index: 5;
         }
 
@@ -782,13 +783,40 @@
 
     <!-- TELA PRETA DE INÍCIO (ESTILO INFINITEPAY) -->
     <div id="splash-screen">
-        <div class="splash-image-container" id="splashPulseElement">
-            <!-- Insira o link da sua imagem redonda na tag src abaixo -->
-            <img src="https://via.placeholder.com/150" alt="Logo" onerror="this.style.display='none'">
-            <i class="fa-solid fa-play"></i>
-        </div>
-        <div class="splash-brand-name">Alto Play MJ</div>
+    <div class="splash-image-container" id="splashPulseElement" style="position: relative;">
+        <!-- Imagem 1 (Começa visível) -->
+        <img class="splash-img-pulse" src="https://i.ibb.co/Whbm6J6/120445.png" alt="Logo 1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 1; transition: opacity 0.5s ease-in-out;">
+        
+        <!-- Imagem 2 (Troque o link pelo seu) -->
+        <img class="splash-img-pulse" src="https://i.ibb.co/7xVkr2V4/120448.png" alt="Logo 2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
+        
+        <!-- Imagem 3 (Troque o link pelo seu) -->
+        <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
     </div>
+    <div class="splash-brand-name">Alto Play MJ</div>
+</div>
+
+<script>
+    // Script para alternar as imagens de forma suave
+    (function() {
+        const imagens = document.querySelectorAll('.splash-img-pulse');
+        let indexAtual = 0;
+
+        // Altera a imagem a cada 2 segundos (ajuste o tempo se o seu pulso for mais rápido ou lento)
+        setInterval(() => {
+            if (imagens.length === 0) return;
+            
+            // Esconde a imagem atual
+            imagens[indexAtual].style.opacity = '0';
+            
+            // Vai para a próxima imagem
+            indexAtual = (indexAtual + 1) % imagens.length;
+            
+            // Mostra a próxima imagem
+            imagens[indexAtual].style.opacity = '1';
+        }, 600); // 1000ms = 1 segundos
+    })();
+</script>
 
     <div class="toast" id="toastBox">Notificação</div>
 
@@ -817,14 +845,14 @@
             </button>
             <div class="brand-logo-wrapper">
                 <div class="brand-logo-circle">
-                    <i class="fa-solid fa-play"></i>
+                     <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                 </div>
                 <span class="brand-name">Auto Play MJ</span>
             </div>
         </div>
         
-        <label class="import-btn-label" for="audioFileInput">
-            <i class="fa-solid fa-file-medical"></i> Adicionar
+        <label class="import-btn-label" for="audioFileInput" style="font-size:10px;">
+            <i style="color: #d46a13;" class="fa-solid fa-file-medical"></i> Adicionar<br>Músicas
         </label>
         <input type="file" id="audioFileInput" multiple accept="audio/*" style="display: none;" onchange="handleFileSelect(event)">
     </div>
@@ -850,6 +878,17 @@
 
         <!-- CONTROLES COM MODOS DE REPRODUÇÃO SOLICITADOS -->
         <div class="player-controls">
+
+<!-- BOTÃO COM IMAGENS ALTERNANDO (10 SEGUNDOS) -->
+<div style="display: inline-flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
+    <a href="#" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 12px; overflow: hidden; position: relative; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,102,0,0.3);">
+        <video src="GatinhoDancando.mp4" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+    </a>
+    <p style="margin: 0; font-size: 8px; font-family: sans-serif; color: #fff; font-weight: bold;">Clique no Gatinho</p>
+</div>
+
+
+            
             <button class="control-btn active-mode" id="modeListBtn" onclick="setPlaybackMode('list')" title="Tocar em Ordem da Lista">
                 <i class="fa-solid fa-list-ol"></i>
             </button>
@@ -863,7 +902,7 @@
             <span style="width: 10px;"></span>
 
             <button class="control-btn" onclick="playPrevious()"><i class="fa-solid fa-backward-step"></i></button>
-            <button class="control-btn btn-play-pause" onclick="togglePlayPause()">
+            <button style="width: 60px; height: 43px;" class="control-btn btn-play-pause" onclick="togglePlayPause()">
                 <i class="fa-solid fa-play" id="mainPlayIcon"></i>
             </button>
             <button class="control-btn" onclick="playNext()"><i class="fa-solid fa-forward-step"></i></button>
@@ -872,7 +911,7 @@
 
     <!-- LISTA DE REPRODUÇÃO -->
     <div class="playlist-section">
-        <div class="playlist-header">Fila de reprodução activa</div>
+        <div class="playlist-header" style="text-align:center;">Ordem de reprodução</div>
         <div class="tracks-list" id="playlistContainer">
             <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
                 Fila vazia. Escolha uma pasta no menu ou importe arquivos baixados.
@@ -884,7 +923,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)">
         <div class="sidebar-panel" onclick="event.stopPropagation()">
             <div class="sidebar-header">
-                <div class="sidebar-title">Bibliotecas de Áudio</div>
+                <div class="sidebar-title">Bibliotecas de Músicas</div>
                 <button class="close-sidebar-btn" onclick="toggleSidebar(false)">
                     <i class="fa-solid fa-xmark"></i>
                 </button>              
@@ -893,24 +932,83 @@
 
 
 
-            
-            <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px 5px 20px;">
-                <!-- Botão redondo alinhado à esquerda -->
-                <a href="Musicas-Pagas.html" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background-color: var(--laranja-vivo); color: #000000; text-decoration: none; font-size: 1.3rem; box-shadow: 0 0 15px var(--laranja-glow); flex-shrink: 0;">
-                    <i class="fa-solid fa-gem"></i>
-                </a>
-                <!-- Frase logo na frente -->                
-                <p style="font-size: 0.6rem; color: #ffffff; font-weight: 500; margin: 0; line-height: 1.3;">
-                    Mais de 4 mil músicas Disponível por <span style="color: #00ff66; display: inline-block; animation: pulse-glow 0.8s infinite alternate; font-weight: 700;">R$ 10,00</span> Reais
-                </p>         
-            </div>
+<!-- CARD PREMIUM -->
+<div style="display:flex; align-items:center; gap:18px; background:linear-gradient(145deg,#1d1d1d,#101010); border:1px solid rgba(255,140,0,.35); border-radius:18px; padding:18px; margin:15px 18px; box-shadow:0 10px 25px rgba(0,0,0,.35);">
+    <!-- Ícone -->
+    <a href="Musicas-Pagas.html" style="
+        width:68px;
+        height:68px;
+        border-radius:50%;
+        background:var(--laranja-vivo);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#fff;
+        text-decoration:none;
+        font-size:2.0rem;
+        box-shadow:0 0 20px var(--laranja-glow);
+        flex-shrink:0;
+    ">
+        <i class="fa-solid fa-gem"></i>
+    </a>
+
+    <!-- Conteúdo -->
+    <div style="flex:1;">
+
+        <div style="color:#fff; font-size:0.6rem;font-weight:700;margin-bottom:8px;">
+            🎵 Mais de <span style="color:var(--laranja-vivo);">4 Mil músicas</span>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+            <span style="background:#ffaa0020;color:#ffb347;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
+                Atualizadas
+            </span>
+            <span style="background:#ff333320;color:#ff5555;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
+                Escolhidas
+            </span>            
+            <span style="background:#3399ff20;color:#66bbff;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
+                Selecionadas
+            </span>
+            <span style="background:#ffaa0020;color:#ffb347;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
+                As Melhores
+            </span>
+        </div>
+
+        <a href="Musicas-Pagas.html" style="
+            display:inline-block;
+            background:var(--laranja-vivo);
+            color:#fff;
+            text-decoration:none;
+            padding:5px 13px;
+            border-radius:12px;
+            font-size:0.2rem;
+            font-weight:800;
+            text-align:center;
+            box-shadow:0 0 18px var(--laranja-glow);
+            animation:pulse-glow .8s infinite alternate;
+        ">
+            💎 Desbloquear por apenas 💎<br> R$ 10,00
+        </a>
+
+    </div>
+
+</div>
 
 
 
 
 
 
-            
+
+             <style>
+@keyframes setaBounce {0%,100%{transform:translateY(0);}50%{transform:translateY(8px);    }}
+</style>
+
+<div style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3399ff20,#3399ff35);color:#66bbff;padding:14px 18px;border-radius:18px;font-size:0.95rem;font-weight:700;border:1px solid rgba(102,187,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.15);">
+    <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
+    <span style="font-size: 13px;">Diversas Músicas Grátis</span>
+    <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
+</div>
             <!-- LISTA DE PASTAS -->
             <div class="folders-container" id="foldersContainer">
                 <!-- Injetado via JS -->
@@ -998,21 +1096,21 @@
 
         // DEFINIÇÃO DAS 15 PASTAS DO MENU
         const folderDatabase = [
-            { id: 1, name: "Sertanejo Universitário", color: "#ff2a6d", bgIcon: "🎸", key: "sertanejo" },
-            { id: 2, name: "Hip Hop & Rap", color: "#05d9e8", bgIcon: "🎤", key: "hiphop" },
-            { id: 3, name: "As Mais Tocadas (Top 50)", color: "#1333c2", bgIcon: "🔥", key: "top50" },
-            { id: 4, name: "Eletrônica & Dance", color: "#39ff14", bgIcon: "⚡", key: "eletronica" },
-            { id: 5, name: "Funk Premium", color: "#ff007f", bgIcon: "🔊", key: "funk" },
-            { id: 6, name: "Pop Internacional", color: "#f5a623", bgIcon: "⭐", key: "pop" },
-            { id: 7, name: "Rock & Heavy Metal", color: "#795548", bgIcon: "💀", key: "rock" },
-            { id: 8, name: "Reggae & Vibes", color: "#4caf50", bgIcon: "🍁", key: "reggae" },
-            { id: 9, name: "Pagode & Samba", color: "#ffeb3b", bgIcon: "🪘", key: "pagode" },
-            { id: 10, name: "Modão Sertanejo", color: "#9c27b0", bgIcon: "🤠", key: "modao" },
-            { id: 11, name: "Trap Nacional", color: "#00bcd4", bgIcon: "💎", key: "trap" },
-            { id: 12, name: "Flashback 80/90", color: "#e91e63", bgIcon: "📼", key: "flashback" },
-            { id: 13, name: "R&B / Soul", color: "#673ab7", bgIcon: "🍷", key: "rnb" },
-            { id: 14, name: "Gospel / Louvores", color: "#3f51b5", bgIcon: "🙏", key: "gospel" },
-            { id: 15, name: "Lo-Fi Beats (Para Dirigir)", color: "#009688", bgIcon: "☕", key: "lofi" }
+            { id: 1, name: "Sertanejos", color: "#5b0b8a", bgIcon: "🎸", key: "sertanejo", description: "As melhores do sertanejo de 2026: Clique para ver" },
+            { id: 2, name: "Hip Hop & Rap", color: "#05d9e8", bgIcon: "🎤", key: "hiphop", description: "Hungria, Tribo da Periferia e muito mais: Clique para ver" },
+            { id: 3, name: "As Mais Tocadas (Top 50)", color: "#1333c2", bgIcon: "🔥", key: "top50", description: ": Clique para ver" },
+            { id: 4, name: "Eletrônica & Dance", color: "#fc6603", bgIcon: "⚡", key: "eletronica", description: ": Clique para ver" },
+            { id: 5, name: "Funk Premium", color: "#ff007f", bgIcon: "🔊", key: "funk", description: ": Clique para ver" },
+            { id: 6, name: "Pop Internacional", color: "#8a720b", bgIcon: "⭐", key: "pop", description: ": Clique para ver" },
+            { id: 7, name: "Rock & Heavy Metal", color: "#795548", bgIcon: "💀", key: "rock", description: ": Clique para ver" },
+            { id: 8, name: "Reggae & Vibes", color: "#5c0f3e", bgIcon: "🍁", key: "reggae", description: ": Clique para ver" },
+            { id: 9, name: "Pagode & Samba", color: "#0f5c39", bgIcon: "🪘", key: "pagode", description: ": Clique para ver" },
+            { id: 10, name: "Modão Sertanejo", color: "#9c27b0", bgIcon: "🤠", key: "modao", description: ": Clique para ver" },
+            { id: 11, name: "Trap Nacional", color: "#00bcd4", bgIcon: "💎", key: "trap", description: ": Clique para ver" },
+            { id: 12, name: "Flashback 80/90", color: "#e91e63", bgIcon: "📼", key: "flashback", description: ": Clique para ver" },
+            { id: 13, name: "R&B / Soul", color: "#673ab7", bgIcon: "🍷", key: "rnb", description: ": Clique para ver" },
+            { id: 14, name: "Gospel / Louvores", color: "#3f51b5", bgIcon: "🙏", key: "gospel", description: ": Clique para ver" },
+            { id: 15, name: "Lo-Fi Beats (Para Dirigir)", color: "#009688", bgIcon: "☕", key: "lofi", description: ": Clique para ver" }
         ];
 
         // =========================================================================
@@ -1020,8 +1118,8 @@
         // =========================================================================
         const playlistManager = {
             sertanejo: [
-                { title: "Bandido do Amor", artist: "Ayala & Julio Cesar & Jennifer e Stephany", url: "Sertanejo/1.mp3", filename: "Bandido_do_Amor_MJ.mp3" },
-                { title: "Atriz Demais", artist: "Bruno Rosa & Murilo Huff", url: "Sertanejo/2.mp3", filename: "Atriz_Demais_MJ.mp3" },
+                { title: "1ª • Bandido do Amor", artist: "Ayala & Julio Cesar ~ Jennifer & Stephany", url: "Sertanejo/1.mp3", filename: "Bandido_do_Amor_MJ.mp3" },
+                { title: "2ª • Atriz Demais", artist: "Bruno Rosa & Murilo Huff", url: "Sertanejo/2.mp3", filename: "Atriz_Demais_MJ.mp3" },
                 { title: "Música Sertaneja 3", artist: "Modo Grátis", url: "Sertanejo/3.mp3", filename: "Sertanejo_3_MJ.mp3" },
                 { title: "Música Sertaneja 4", artist: "Modo Grátis", url: "Sertanejo/4.mp3", filename: "Sertanejo_4_MJ.mp3" },
                 { title: "Música Sertaneja 5", artist: "Modo Grátis", url: "Sertanejo/5.mp3", filename: "Sertanejo_5_MJ.mp3" },
@@ -1181,21 +1279,25 @@
             else sidebarOverlay.classList.remove('open');
         }
 
-        function renderFoldersUI() {
+         function renderFoldersUI() {
             foldersContainer.innerHTML = "";
             folderDatabase.forEach((folder, idx) => {
                 const fItem = document.createElement('div');
                 fItem.className = 'folder-item';
                 fItem.style.backgroundColor = 'rgba(25, 25, 25, 0.6)';
                 fItem.style.borderLeft = `4px solid ${folder.color}`;
+                fItem.style.alignItems = 'center'; // Mantém tudo alinhado no meio
                 fItem.onclick = () => openFolderContainer(idx);
 
                 fItem.innerHTML = `
-                    <div class="folder-left">
-                        <div class="folder-icon-box" style="background: ${folder.color};">
+                    <div class="folder-left" style="flex: 1;">
+                        <div class="folder-icon-box" style="background: ${folder.color}; flex-shrink: 0;">
                             ${folder.bgIcon}
                         </div>
-                        <div class="folder-info-name">${folder.name}</div>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <div class="folder-info-name" style="font-size: 13px;">${folder.name}</div>
+                            <div style="font-size: 0.6rem; color: #888;">${folder.description}</div>
+                        </div>
                     </div>
                     <button class="folder-download-all-btn" onclick="downloadFolderFromSidebar(${idx}, event)" title="Baixar toda a pasta">
                         <i class="fa-solid fa-download"></i>
@@ -1204,6 +1306,7 @@
                 foldersContainer.appendChild(fItem);
             });
         }
+           
 
         // VISUALIZAÇÃO INTERNA DA PASTA SELECIONADA
         function openFolderContainer(index) {
