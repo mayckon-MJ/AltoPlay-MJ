@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -773,9 +774,102 @@
             transform: scale(0.95);
             background: rgba(255, 102, 0, 0.15);
         }
+
+        /* NOVOS ESTILOS: MODAL DE REGISTRO DE PRIMEIRO ACESSO */
+        .modal-registro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: var(--vidro-blur);
+            -webkit-backdrop-filter: var(--vidro-blur);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10010;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .modal-registro-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-registro-content {
+            background: rgba(15, 15, 15, 0.98);
+            border: 1px solid var(--vidro-borda);
+            padding: 25px;
+            border-radius: 24px;
+            width: 88%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px var(--laranja-glow);
+            text-align: center;
+        }
+        .modal-registro-content h3 {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .modal-registro-content p {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        .modal-registro-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 102, 0, 0.25);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .modal-registro-input:focus {
+            border-color: var(--laranja-vivo);
+        }
+        .modal-registro-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--laranja-vivo);
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--laranja-glow);
+            transition: transform 0.1s;
+        }
+        .modal-registro-btn:active {
+            transform: scale(0.97);
+        }
+        .modal-registro-btn:disabled {
+            background: #555;
+            color: #aaa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
+
+    <!-- MODAL DE PRIMEIRO ACESSO -->
+    <div class="modal-registro-overlay" id="modalRegistroOverlay">
+        <div class="modal-registro-content">
+            <h3>Seja Bem-vindo!</h3>
+            <p>Por favor, informe seus dados para liberar o player.</p>
+            <input type="text" id="regNome" class="modal-registro-input" placeholder="Seu Nome Completo">
+            <input type="tel" id="regWhatsapp" class="modal-registro-input" placeholder="Seu WhatsApp (com DDD)">
+            <button class="modal-registro-btn" id="btnConfirmarRegistro" onclick="enviarDadosRegistro()">Confirmar</button>
+        </div>
+    </div>
 
     <!-- TELA PRETA DE INÍCIO (ESTILO INFINITEPAY) -->
     <div id="splash-screen">
@@ -992,6 +1086,8 @@
             splashScreen.style.pointerEvents = 'none';
             setTimeout(() => {
                 splashScreen.style.display = 'none';
+                // Verifica o primeiro acesso logo que o Splash termina
+                verificarPrimeiroAcesso();
             }, 500);
         });
 
@@ -1030,6 +1126,52 @@
         const folderSongsContainer = document.getElementById('folderSongsContainer');
         const favCountBadge = document.getElementById('favCountBadge');
         const pwaInstallBanner = document.getElementById('pwaInstallBanner');
+
+        // LÓGICA DE REGISTRO / PRIMEIRO ACESSO
+        function verificarPrimeiroAcesso() {
+            if (!localStorage.getItem('MJ_UsuarioRegistrado')) {
+                document.getElementById('modalRegistroOverlay').classList.add('open');
+            }
+        }
+
+        function enviarDadosRegistro() {
+            const nomeInput = document.getElementById('regNome').value.trim();
+            const celularInput = document.getElementById('regWhatsapp').value.trim();
+            const btnConfirmar = document.getElementById('btnConfirmarRegistro');
+
+            if (!nomeInput || !celularInput) {
+                showToast("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerText = "Enviando...";
+
+            const urlScript = 'https://script.google.com/macros/s/AKfycbzXFGNQsXMt55VdcfdZcg5CLkXLKtIW0Xd4-LPL4RvQvfIqrR-5UEIeI9PtJmIlRpGMEg/exec';
+
+            fetch(urlScript, {
+                method: 'POST',
+                mode: 'no-cors', // Utilizado para evitar bloqueios de redirecionamento nativos do Apps Script
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nome: nomeInput,
+                    celular: celularInput
+                })
+            })
+            .then(() => {
+                localStorage.setItem('MJ_UsuarioRegistrado', 'true');
+                document.getElementById('modalRegistroOverlay').classList.remove('open');
+                showToast("Dados confirmados com sucesso!");
+            })
+            .catch(error => {
+                console.error("Erro ao enviar dados para a planilha:", error);
+                showToast("Ocorreu um erro. Tente novamente.");
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerText = "Confirmar";
+            });
+        }
 
         // Função auxiliar para gerar cores aleatórias para as pastas
         function getRandomColor() {
@@ -1102,7 +1244,7 @@
                     const state = JSON.parse(savedState);
                     playlist = state.playlist || [];
                     
-                    // Re-hidrata a playlist ativa
+                    // Re-hidrata a playlist activa
                     playlist.forEach(song => {
                         if (song.fileId && blobMap[song.fileId]) {
                             song.url = blobMap[song.fileId];
@@ -1710,4 +1852,3 @@
     </script>
 </body>
 </html>
-
