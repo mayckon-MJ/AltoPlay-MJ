@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,15 +7,13 @@
     <title>Auto Play MJ</title>
     <link rel="manifest" href="./manifest.json">
     
-    
     <!-- Configurações para PWA (Android/iOS) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Auto Play MJ">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="<link rel="apple-touch-icon" href="https://i.ibb.co/WJB55vX/119623.png">
-
+    <link rel="apple-touch-icon" href="https://i.ibb.co/WJB55vX/119623.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -76,7 +72,6 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            /* Executa a animação de pulso laranja exatamente 3 vezes (durando 1 segundo cada ciclo) */
             animation: infinitepay-pulse 1s ease-in-out;
             animation-iteration-count: 3;
             margin-bottom: 25px;
@@ -89,7 +84,6 @@
             object-fit: cover;
         }
 
-        /* Caso falte imagem, um ícone padrão como fallback interno */
         .splash-image-container i {
             font-size: 4rem;
             color: var(--laranja-vivo);
@@ -152,6 +146,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            position: relative;
         }
 
         .brand-logo-circle {
@@ -163,12 +158,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: pulse-glow 2s infinite alternate;
-        }
-
-        .brand-logo-circle i {
-            color: #000;
-            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .brand-name {
@@ -510,7 +501,7 @@
             justify-content: center;
             align-items: center;
             font-size: 1.1rem;
-            color: #000;
+            color: #fff;
             font-weight: bold;
         }
 
@@ -520,20 +511,6 @@
             color: #fff;
         }
 
-        .folder-download-all-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
         /* Rodapé Fixo da Sidebar - Pasta de Favoritas */
         .sidebar-footer-favorites {
             padding: 15px;
@@ -541,7 +518,7 @@
             background: rgba(20, 5, 0, 0.4);
         }
 
-        /* PAINEL DE VISUALIZAÇÃO INTERNA DA PASTA MÚSICAS SERVER */
+        /* PAINEL DE VISUALIZAÇÃO INTERNA DA PASTA MÚSICAS */
         .folder-view-overlay {
             position: absolute;
             top: 0;
@@ -587,13 +564,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-        }
-
-        /* COR RIGIDA DA FRASE: "Baixar Pasta" na cor Laranja */
-        #btnDownloadFolder {
-            border-color: var(--laranja-vivo);
-            color: var(--laranja-vivo);
-            background: rgba(255, 102, 0, 0.05);
         }
 
         .folder-songs-list {
@@ -777,46 +747,37 @@
             from { transform: scale(1); box-shadow: 0 0 5px var(--laranja-glow); }
             to { transform: scale(1.04); box-shadow: 0 0 15px var(--laranja-vivo); }
         }
+        
+        @keyframes setaBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
     </style>
 </head>
 <body>
 
     <!-- TELA PRETA DE INÍCIO (ESTILO INFINITEPAY) -->
     <div id="splash-screen">
-    <div class="splash-image-container" id="splashPulseElement" style="position: relative;">
-        <!-- Imagem 1 (Começa visível) -->
-        <img class="splash-img-pulse" src="https://i.ibb.co/Whbm6J6/120445.png" alt="Logo 1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 1; transition: opacity 0.5s ease-in-out;">
-        
-        <!-- Imagem 2 (Troque o link pelo seu) -->
-        <img class="splash-img-pulse" src="https://i.ibb.co/7xVkr2V4/120448.png" alt="Logo 2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
-        
-        <!-- Imagem 3 (Troque o link pelo seu) -->
-        <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
+        <div class="splash-image-container" id="splashPulseElement">
+            <img class="splash-img-pulse" src="https://i.ibb.co/Whbm6J6/120445.png" alt="Logo 1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 1; transition: opacity 0.5s ease-in-out;">
+            <img class="splash-img-pulse" src="https://i.ibb.co/7xVkr2V4/120448.png" alt="Logo 2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
+            <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; opacity: 0; transition: opacity 0.5s ease-in-out;">
+        </div>
+        <div class="splash-brand-name">Alto Play MJ</div>
     </div>
-    <div class="splash-brand-name">Alto Play MJ</div>
-</div>
 
-<script>
-    // Script para alternar as imagens de forma suave
-    (function() {
-        const imagens = document.querySelectorAll('.splash-img-pulse');
-        let indexAtual = 0;
-
-        // Altera a imagem a cada 2 segundos (ajuste o tempo se o seu pulso for mais rápido ou lento)
-        setInterval(() => {
-            if (imagens.length === 0) return;
-            
-            // Esconde a imagem atual
-            imagens[indexAtual].style.opacity = '0';
-            
-            // Vai para a próxima imagem
-            indexAtual = (indexAtual + 1) % imagens.length;
-            
-            // Mostra a próxima imagem
-            imagens[indexAtual].style.opacity = '1';
-        }, 600); // 1000ms = 1 segundos
-    })();
-</script>
+    <script>
+        (function() {
+            const imagens = document.querySelectorAll('.splash-img-pulse');
+            let indexAtual = 0;
+            setInterval(() => {
+                if (imagens.length === 0) return;
+                imagens[indexAtual].style.opacity = '0';
+                indexAtual = (indexAtual + 1) % imagens.length;
+                imagens[indexAtual].style.opacity = '1';
+            }, 600);
+        })();
+    </script>
 
     <div class="toast" id="toastBox">Notificação</div>
 
@@ -845,16 +806,16 @@
             </button>
             <div class="brand-logo-wrapper">
                 <div class="brand-logo-circle">
-                     <img class="splash-img-pulse" src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                     <img src="https://i.ibb.co/wFmC409b/119623.png" alt="Logo 3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                 </div>
                 <span class="brand-name">Auto Play MJ</span>
             </div>
         </div>
         
-        <label class="import-btn-label" for="audioFileInput" style="font-size:10px;">
-            <i style="color: #d46a13;" class="fa-solid fa-file-medical"></i> Adicionar<br>Músicas
+        <label class="import-btn-label" for="folderImportInput" style="font-size:10px;">
+            <i style="color: #d46a13;" class="fa-solid fa-folder-plus"></i> Importar<br>Pasta
         </label>
-        <input type="file" id="audioFileInput" multiple accept="audio/*" style="display: none;" onchange="handleFileSelect(event)">
+        <input type="file" id="folderImportInput" multiple webkitdirectory directory mimetypes="audio/*" style="display: none;" onchange="handleFolderImport(event)">
     </div>
 
     <!-- PLAYER PRINCIPAL -->
@@ -876,18 +837,14 @@
             </div>
         </div>
 
-        <!-- CONTROLES COM MODOS DE REPRODUÇÃO SOLICITADOS -->
+        <!-- CONTROLES -->
         <div class="player-controls">
-
-<!-- BOTÃO COM IMAGENS ALTERNANDO (10 SEGUNDOS) -->
-<div style="display: inline-flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
-    <a href="#" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 12px; overflow: hidden; position: relative; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,102,0,0.3);">
-        <video src="GatinhoDancando.mp4" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
-    </a>
-    <p style="margin: 0; font-size: 8px; font-family: sans-serif; color: #fff; font-weight: bold;">Clique no Gatinho</p>
-</div>
-
-
+            <div style="display: inline-flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
+                <a href="#" style="display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 12px; overflow: hidden; position: relative; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,102,0,0.3);">
+                    <video src="GatinhoDancando.mp4" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+                </a>
+                <p style="margin: 0; font-size: 8px; font-family: sans-serif; color: #fff; font-weight: bold;">Clique no Gatinho</p>
+            </div>
             
             <button class="control-btn active-mode" id="modeListBtn" onclick="setPlaybackMode('list')" title="Tocar em Ordem da Lista">
                 <i class="fa-solid fa-list-ol"></i>
@@ -914,12 +871,12 @@
         <div class="playlist-header" style="text-align:center;">Ordem de reprodução</div>
         <div class="tracks-list" id="playlistContainer">
             <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
-                Fila vazia. Escolha uma pasta no menu ou importe arquivos baixados.
+                Fila vazia. Importe uma pasta no botão superior.
             </div>
         </div>
     </div>
 
-    <!-- SIDEBAR DE CONFIGURAÇÃO / 15 PASTAS -->
+    <!-- SIDEBAR DE CONFIGURAÇÃO -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)">
         <div class="sidebar-panel" onclick="event.stopPropagation()">
             <div class="sidebar-header">
@@ -929,89 +886,15 @@
                 </button>              
             </div>
 
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3399ff20,#3399ff35);color:#66bbff;padding:14px 18px;border-radius:18px;font-size:0.95rem;font-weight:700;border:1px solid rgba(102,187,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.15);">
+                <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
+                <span style="font-size: 13px;">Suas Pastas Importadas</span>
+                <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
+            </div>
 
-
-
-<!-- CARD PREMIUM -->
-<div style="display:flex; align-items:center; gap:18px; background:linear-gradient(145deg,#1d1d1d,#101010); border:1px solid rgba(255,140,0,.35); border-radius:18px; padding:18px; margin:15px 18px; box-shadow:0 10px 25px rgba(0,0,0,.35);">
-    <!-- Ícone -->
-    <a href="Musicas-Pagas.html" style="
-        width:68px;
-        height:68px;
-        border-radius:50%;
-        background:var(--laranja-vivo);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:#fff;
-        text-decoration:none;
-        font-size:2.0rem;
-        box-shadow:0 0 20px var(--laranja-glow);
-        flex-shrink:0;
-    ">
-        <i class="fa-solid fa-gem"></i>
-    </a>
-
-    <!-- Conteúdo -->
-    <div style="flex:1;">
-
-        <div style="color:#fff; font-size:0.6rem;font-weight:700;margin-bottom:8px;">
-            🎵 Mais de <span style="color:var(--laranja-vivo);">4 Mil músicas</span>
-        </div>
-
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-            <span style="background:#ffaa0020;color:#ffb347;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
-                Atualizadas
-            </span>
-            <span style="background:#ff333320;color:#ff5555;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
-                Escolhidas
-            </span>            
-            <span style="background:#3399ff20;color:#66bbff;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
-                Selecionadas
-            </span>
-            <span style="background:#ffaa0020;color:#ffb347;padding:2px 9px;border-radius:20px;font-size:0.5rem;font-weight:bold;">
-                As Melhores
-            </span>
-        </div>
-
-        <a href="Musicas-Pagas.html" style="
-            display:inline-block;
-            background:var(--laranja-vivo);
-            color:#fff;
-            text-decoration:none;
-            padding:5px 13px;
-            border-radius:12px;
-            font-size:0.9rem;
-            font-weight:800;
-            text-align:center;
-            box-shadow:0 0 18px var(--laranja-glow);
-            animation:pulse-glow .8s infinite alternate;
-        ">
-            💎 Desbloquear por apenas 💎
-        </a>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-
-             <style>
-@keyframes setaBounce {0%,100%{transform:translateY(0);}50%{transform:translateY(8px);    }}
-</style>
-
-<div style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3399ff20,#3399ff35);color:#66bbff;padding:14px 18px;border-radius:18px;font-size:0.95rem;font-weight:700;border:1px solid rgba(102,187,255,.35);box-shadow:0 4px 12px rgba(0,0,0,.15);">
-    <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
-    <span style="font-size: 13px;">Diversas Músicas Grátis</span>
-    <i class="fa-solid fa-arrow-down" style=" color:var(--laranja-vivo); font-size:1.2rem; animation:setaBounce .8s ease-in-out infinite;"></i>
-</div>
-            <!-- LISTA DE PASTAS -->
+            <!-- LISTA DE PASTAS IMPORTADAS -->
             <div class="folders-container" id="foldersContainer">
-                <!-- Injetado via JS -->
+                <!-- Injetado via JS dinamicamente -->
             </div>
 
             <!-- RODAPÉ FIXO: PASTA DE FAVORITAS -->
@@ -1037,9 +920,6 @@
                 <div class="folder-view-subtitle" id="folderViewCount">0 músicas disponíveis</div>
             </div>
             <div class="folder-view-actions">
-                <button class="import-btn-label" id="btnDownloadFolder" onclick="downloadCurrentFolderFull()">
-                    <i class="fa-solid fa-cloud-arrow-down"></i> Baixar Pasta
-                </button>
                 <button class="close-sidebar-btn" onclick="closeFolderView()">
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
@@ -1051,12 +931,11 @@
     </div>
 
     <script>
-        // LÓGICA DO SPLASH SCREEN (ACAO DO PULSO 3 VEZES E ENTRAR NO SISTEMA)
+        // LÓGICA DO SPLASH SCREEN
         const splashScreen = document.getElementById('splash-screen');
         const splashPulseElement = document.getElementById('splashPulseElement');
 
         splashPulseElement.addEventListener('animationend', () => {
-            // Quando a animação terminar suas 3 repetições, esconde a tela preta
             splashScreen.style.opacity = '0';
             splashScreen.style.pointerEvents = 'none';
             setTimeout(() => {
@@ -1068,8 +947,9 @@
         let playlist = [];
         let currentIndex = -1;
         let isPlaying = false;
-        let playbackMode = 'list'; // 'list' | 'shuffle' | 'loop'
+        let playbackMode = 'list';
         let favoriteTracks = JSON.parse(localStorage.getItem('MJ_Favorites')) || [];
+        let importedFolders = []; 
         let deferredPrompt = null;
 
         const audioNode = new Audio();
@@ -1094,104 +974,17 @@
         const favCountBadge = document.getElementById('favCountBadge');
         const pwaInstallBanner = document.getElementById('pwaInstallBanner');
 
-        // DEFINIÇÃO DAS 15 PASTAS DO MENU
-        const folderDatabase = [
-            { id: 1, name: "Sertanejos", color: "#5b0b8a", bgIcon: "🎸", key: "sertanejo", description: "As melhores do sertanejo de 2026: Clique para ver" },
-            { id: 2, name: "Hip Hop & Rap", color: "#05d9e8", bgIcon: "🎤", key: "hiphop", description: "Hungria, Tribo da Periferia e muito mais: Clique para ver" },
-            { id: 3, name: "As Mais Tocadas (Top 50)", color: "#1333c2", bgIcon: "🔥", key: "top50", description: ": Clique para ver" },
-            { id: 4, name: "Eletrônica & Dance", color: "#fc6603", bgIcon: "⚡", key: "eletronica", description: ": Clique para ver" },
-            { id: 5, name: "Funk Premium", color: "#ff007f", bgIcon: "🔊", key: "funk", description: ": Clique para ver" },
-            { id: 6, name: "Pop Internacional", color: "#8a720b", bgIcon: "⭐", key: "pop", description: ": Clique para ver" },
-            { id: 7, name: "Rock & Heavy Metal", color: "#795548", bgIcon: "💀", key: "rock", description: ": Clique para ver" },
-            { id: 8, name: "Reggae & Vibes", color: "#5c0f3e", bgIcon: "🍁", key: "reggae", description: ": Clique para ver" },
-            { id: 9, name: "Pagode & Samba", color: "#0f5c39", bgIcon: "🪘", key: "pagode", description: ": Clique para ver" },
-            { id: 10, name: "Modão Sertanejo", color: "#9c27b0", bgIcon: "🤠", key: "modao", description: ": Clique para ver" },
-            { id: 11, name: "Trap Nacional", color: "#00bcd4", bgIcon: "💎", key: "trap", description: ": Clique para ver" },
-            { id: 12, name: "Flashback 80/90", color: "#e91e63", bgIcon: "📼", key: "flashback", description: ": Clique para ver" },
-            { id: 13, name: "R&B / Soul", color: "#673ab7", bgIcon: "🍷", key: "rnb", description: ": Clique para ver" },
-            { id: 14, name: "Gospel / Louvores", color: "#3f51b5", bgIcon: "🙏", key: "gospel", description: ": Clique para ver" },
-            { id: 15, name: "Lo-Fi Beats (Para Dirigir)", color: "#009688", bgIcon: "☕", key: "lofi", description: ": Clique para ver" }
-        ];
+        // Função auxiliar para gerar cores aleatórias para as pastas
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
 
-        // =========================================================================
-        // GERENCIADOR DE MÚSICAS: ADICIONE OS ENDEREÇOS E NOMES DAS MÚSICAS AQUI!
-        // =========================================================================
-        const playlistManager = {
-            sertanejo: [
-                { title: "1ª • Bandido do Amor", artist: "Ayala & Julio Cesar ~ Jennifer & Stephany", url: "Sertanejo/1.mp3", filename: "Bandido_do_Amor_MJ.mp3" },
-                { title: "2ª • Atriz Demais", artist: "Bruno Rosa & Murilo Huff", url: "Sertanejo/2.mp3", filename: "Atriz_Demais_MJ.mp3" },
-                { title: "Música Sertaneja 3", artist: "Modo Grátis", url: "Sertanejo/3.mp3", filename: "Sertanejo_3_MJ.mp3" },
-                { title: "Música Sertaneja 4", artist: "Modo Grátis", url: "Sertanejo/4.mp3", filename: "Sertanejo_4_MJ.mp3" },
-                { title: "Música Sertaneja 5", artist: "Modo Grátis", url: "Sertanejo/5.mp3", filename: "Sertanejo_5_MJ.mp3" },
-                { title: "Música Sertaneja 6", artist: "Modo Grátis", url: "Sertanejo/6.mp3", filename: "Sertanejo_6_MJ.mp3" },
-                { title: "Música Sertaneja 7", artist: "Modo Grátis", url: "Sertanejo/7.mp3", filename: "Sertanejo_7_MJ.mp3" },
-                { title: "Música Sertaneja 8", artist: "Modo Grátis", url: "Sertanejo/8.mp3", filename: "Sertanejo_8_MJ.mp3" },
-                { title: "Música Sertaneja 9", artist: "Modo Grátis", url: "Sertanejo/9.mp3", filename: "Sertanejo_9_MJ.mp3" },               
-                { title: "Música Sertaneja 10", artist: "Modo Grátis", url: "Sertanejo/10.mp3", filename: "sertanejo_10_MJ.mp3" },             
-                { title: "Teste MJ-KA", artist: "Fernandimho", url: "musicateste.mp3", filename: "Teste-MJ-KA.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            hiphop: [
-                { title: "Rap Música 1", artist: "Rapper X", url: "LINK_DA_MUSICA", filename: "hiphop1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            top50: [
-                { title: "Top Hit 1", artist: "Sucesso Anual", url: "LINK_DA_MUSICA", filename: "top1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            eletronica: [
-                { title: "Eletronica 1", artist: "DJ Beat", url: "LINK_DA_MUSICA", filename: "electro1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            funk: [
-                { title: "Funk Track 1", artist: "MC Som", url: "LINK_DA_MUSICA", filename: "funk1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            pop: [
-                { title: "Pop International 1", artist: "Diva Pop", url: "LINK_DA_MUSICA", filename: "pop1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            rock: [
-                { title: "Rock Classic 1", artist: "Banda de Rock", url: "LINK_DA_MUSICA", filename: "rock1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            reggae: [
-                { title: "Reggae Track 1", artist: "Vibe Positiva", url: "LINK_DA_MUSICA", filename: "reggae1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            pagode: [
-                { title: "Pagode de Mesa 1", artist: "Grupo Samba", url: "LINK_DA_MUSICA", filename: "pagode1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            modao: [
-                { title: "Modão Antigo 1", artist: "Dupla Raiz", url: "LINK_DA_MUSICA", filename: "modao1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            trap: [
-                { title: "Trap Nacional 1", artist: "Trapper Br", url: "LINK_DA_MUSICA", filename: "trap1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            flashback: [
-                { title: "Flashback 80s Hits 1", artist: "Retrô Band", url: "LINK_DA_MUSICA", filename: "flashback1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            rnb: [
-                { title: "Soul R&B Track 1", artist: "Vocalist Premium", url: "LINK_DA_MUSICA", filename: "rnb1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            gospel: [
-                { title: "Louvor Adoração 1", artist: "Ministério Fé", url: "LINK_DA_MUSICA", filename: "gospel1.mp3" }
-            ],
-            //🎶🎶🎶🎶
-            lofi: [
-                { title: "Lo-Fi Calm Beat 1", artist: "Relax Mind", url: "LINK_DA_MUSICA", filename: "lofi1.mp3" }
-            ]
-        };
-
-        let currentActiveOpenFolderIdx = null;
-        let activeFolderSongsList = [];
-
-        // FUNÇÕES DE PERSISTÊNCIA COMPLETA (ESTADO DO PLAYER)
+        // FUNÇÕES DE PERSISTÊNCIA COMPLETA
         function savePlayerState() {
             const state = {
                 playlist: playlist,
@@ -1240,7 +1033,6 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Exibe o banner pop-up customizado
             pwaInstallBanner.classList.add('show');
         });
 
@@ -1279,34 +1071,98 @@
             else sidebarOverlay.classList.remove('open');
         }
 
-         function renderFoldersUI() {
+        // ATUALIZA INTERFACE DAS PASTAS NA SIDEBAR
+        function renderFoldersUI() {
             foldersContainer.innerHTML = "";
-            folderDatabase.forEach((folder, idx) => {
+            if (importedFolders.length === 0) {
+                foldersContainer.innerHTML = `<div style="color:#555; text-align:center; padding: 20px 0; font-size:0.85rem;">Nenhuma pasta importada ainda.</div>`;
+                return;
+            }
+
+            importedFolders.forEach((folder, idx) => {
                 const fItem = document.createElement('div');
                 fItem.className = 'folder-item';
                 fItem.style.backgroundColor = 'rgba(25, 25, 25, 0.6)';
                 fItem.style.borderLeft = `4px solid ${folder.color}`;
-                fItem.style.alignItems = 'center'; // Mantém tudo alinhado no meio
                 fItem.onclick = () => openFolderContainer(idx);
 
                 fItem.innerHTML = `
                     <div class="folder-left" style="flex: 1;">
                         <div class="folder-icon-box" style="background: ${folder.color}; flex-shrink: 0;">
-                            ${folder.bgIcon}
+                            <i class="fa-solid fa-folder"></i>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 2px;">
                             <div class="folder-info-name" style="font-size: 13px;">${folder.name}</div>
-                            <div style="font-size: 0.6rem; color: #888;">${folder.description}</div>
+                            <div style="font-size: 0.6rem; color: #888;">${folder.songs.length} música(s) nesta pasta</div>
                         </div>
                     </div>
-                    <button class="folder-download-all-btn" onclick="downloadFolderFromSidebar(${idx}, event)" title="Baixar toda a pasta">
-                        <i class="fa-solid fa-download"></i>
-                    </button>
                 `;
                 foldersContainer.appendChild(fItem);
             });
         }
-           
+
+        // CAPTURA E PROCESSAMENTO DA IMPORTAÇÃO DE PASTAS DO DISPOSITIVO
+        function handleFolderImport(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            const folderMap = {};
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Valida se o arquivo é de áudio pelas extensões comuns
+                if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|ogg|m4a|aac|flac)$/i)) {
+                    continue;
+                }
+
+                // Identifica a estrutura de pastas nativa pela propriedade relativePath ou webkitRelativePath
+                let pathParts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [];
+                let folderName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : "Pasta Importada";
+
+                if (!folderMap[folderName]) {
+                    folderMap[folderName] = [];
+                }
+
+                folderMap[folderName].push(file);
+            }
+
+            const folderNames = Object.keys(folderMap);
+            if (folderNames.length === 0) {
+                showToast("Nenhum arquivo de áudio válido foi encontrado na pasta selecionada.");
+                return;
+            }
+
+            // Transforma o mapa em nosso banco de dados em memória dinâmico
+            folderNames.forEach(name => {
+                const filesList = folderMap[name];
+                const newFolder = {
+                    id: Date.now() + Math.random(),
+                    name: name,
+                    color: getRandomColor(),
+                    songs: []
+                };
+
+                filesList.forEach(file => {
+                    const blobURL = URL.createObjectURL(file);
+                    newFolder.songs.push({
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        artist: "Arquivo Local",
+                        url: blobURL
+                    });
+                });
+
+                importedFolders.push(newFolder);
+            });
+
+            showToast(`${folderNames.length} pasta(s) carregada(s) com sucesso!`);
+            renderFoldersUI();
+            toggleSidebar(true);
+            event.target.value = ''; // Limpa o seletor
+        }
+
+        let currentActiveOpenFolderIdx = null;
+        let activeFolderSongsList = [];
 
         // VISUALIZAÇÃO INTERNA DA PASTA SELECIONADA
         function openFolderContainer(index) {
@@ -1315,22 +1171,18 @@
             folderSongsContainer.innerHTML = "";
 
             if (index === -1) {
-                // Pasta Favoritos
                 folderViewTitle.innerText = "Músicas Favoritas";
                 activeFolderSongsList = [...favoriteTracks];
-                document.getElementById('btnDownloadFolder').style.display = 'none';
             } else {
-                // Pastas Temáticas estruturadas vindas do playlistManager
-                const folder = folderDatabase[index];
+                const folder = importedFolders[index];
                 folderViewTitle.innerText = folder.name;
-                activeFolderSongsList = playlistManager[folder.key] || [];
-                document.getElementById('btnDownloadFolder').style.display = 'block';
+                activeFolderSongsList = folder.songs || [];
             }
 
             folderViewCount.innerText = `${activeFolderSongsList.length} faixas encontradas`;
 
             if(activeFolderSongsList.length === 0) {
-                folderSongsContainer.innerHTML = `<div style="color:#555; text-align:center; padding-top:40px;">Esta pasta não possui músicas configuradas no momento.</div>`;
+                folderSongsContainer.innerHTML = `<div style="color:#555; text-align:center; padding-top:40px;">Esta pasta não possui músicas ou arquivos carregados.</div>`;
             } else {
                 activeFolderSongsList.forEach((song, sIdx) => {
                     const isFav = favoriteTracks.some(f => f.url === song.url);
@@ -1344,9 +1196,6 @@
                         <div class="server-song-controls">
                             <button class="heart-btn ${isFav ? 'active-heart' : ''}" onclick="toggleFavoriteSong(${sIdx}, this)">
                                 <i class="fa-solid fa-heart"></i>
-                            </button>
-                            <button class="track-item-action-btn" onclick="downloadServerFile('${song.url}', '${song.filename}')">
-                                <i class="fa-solid fa-download"></i>
                             </button>
                         </div>
                     `;
@@ -1367,53 +1216,15 @@
             renderPlaylistUI();
             closeFolderView();
             changeTrack(songIndex, true);
-            showToast("Tocando faixas selecionadas da pasta");
+            showToast("Tocando faixas da pasta importada");
             savePlayerState();
         }
 
-        // CARREGAMENTO MANUAL DE ARQUIVOS BAIXADOS (DO CELULAR CONVERTIDO EM BASE64 SEGURO)
-        function handleFileSelect(event) {
-            const files = event.target.files;
-            if (files.length === 0) return;
-
-            let processedCount = 0;
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    const dataURL = e.target.result;
-                    
-                    playlist.push({
-                        title: file.name.replace(/\.[^/.]+$/, ""),
-                        artist: "Arquivo Local Baixado",
-                        url: dataURL,
-                        isLocal: true
-                    });
-
-                    processedCount++;
-
-                    if (processedCount === files.length) {
-                        showToast(`${files.length} música(s) salva(s) na Fila permanentemente`);
-                        renderPlaylistUI();
-
-                        if (currentIndex === -1 && playlist.length > 0) {
-                            changeTrack(0, true);
-                        }
-                        savePlayerState();
-                    }
-                };
-
-                reader.readAsDataURL(file);
-            }
-        }
-
-                function renderPlaylistUI() {
+        function renderPlaylistUI() {
             if (playlist.length === 0) {
                 playlistContainer.innerHTML = `
                     <div class="empty-playlist-msg" style="text-align: center; color: #555; padding: 20px 0; font-size: 0.85rem;">
-                        Fila vazia. Escolha uma pasta no menu ou importe arquivos baixados.
+                        Fila vazia. Importe uma pasta no botão superior.
                     </div>`;
                 return;
             }
@@ -1428,9 +1239,6 @@
                         <div class="track-item-title">${track.title}</div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 5px;">
-                        <button class="track-item-action-btn" onclick="downloadTrackDirect(${index})" title="Baixar esta faixa">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
                         <button class="track-item-action-btn" onclick="removeTrackFromPlaylist(${index}, event)" style="color: #ff3333;" title="Remover da fila">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
@@ -1440,27 +1248,22 @@
             });
         }
 
-                function removeTrackFromPlaylist(index, event) {
-            event.stopPropagation(); // Impede que a música toque ao clicar no X
-            
-            // Remove o item da lista
+        function removeTrackFromPlaylist(index, event) {
+            event.stopPropagation();
             playlist.splice(index, 1);
             
             if (playlist.length === 0) {
-                // Se a lista esvaziou, reseta o player
                 currentIndex = -1;
                 pauseAudio();
                 currentTrackTitle.innerText = "Nenhuma música na fila";
                 currentTrackIndex.innerText = "Abra o menu ou adicione mídias";
                 audioNode.src = "";
             } else if (index === currentIndex) {
-                // Se removeu a música que estava tocando agora
                 if (currentIndex >= playlist.length) {
-                    currentIndex = 0; // Volta para o início se era a última
+                    currentIndex = 0;
                 }
                 changeTrack(currentIndex, isPlaying);
             } else if (index < currentIndex) {
-                // Ajusta o índice ativo se removeu uma música que estava antes da atual
                 currentIndex--;
             }
             
@@ -1468,7 +1271,6 @@
             savePlayerState();
             showToast("Música removida da fila");
         }
-
 
         function changeTrack(index, autoPlay = true) {
             if (index < 0 || index >= playlist.length) return;
@@ -1515,6 +1317,7 @@
             savePlayerState();
         }
 
+        // MODOS DE REPRODUÇÃO
         function setPlaybackMode(mode) {
             playbackMode = mode;
             updatePlaybackModeUI(mode);
@@ -1572,8 +1375,7 @@
                 favoriteTracks.push({
                     title: song.title,
                     artist: song.artist,
-                    url: song.url,
-                    filename: song.filename
+                    url: song.url
                 });
                 buttonEl.classList.add('active-heart');
                 showToast("Adicionado às Favoritas!");
@@ -1589,70 +1391,6 @@
 
         function updateFavBadge() {
             favCountBadge.innerText = favoriteTracks.length;
-        }
-        
-        // SISTEMA DE DOWNLOADS EFETIVOS DOS ARQUIVOS (CORRIGIDO PARA CELULAR)
-        function downloadServerFile(url, filename) {
-            if (url.startsWith('data:')) {
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename || "musica_local.mp3";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                return;
-            }
-
-            showToast("Iniciando download da faixa...");
-            
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error('Erro ao buscar o arquivo');
-                    return response.blob();
-                })
-                .then(blob => {
-                    const blobUrl = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = blobUrl;
-                    a.download = filename || "musica_autoplaymj.mp3";
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(blobUrl);
-                })
-                .catch(err => {
-                    console.error("Erro no download: ", err);
-                    showToast("Erro ao baixar. Verifique a conexão ou o link.");
-                });
-        }
-
-
-        function downloadTrackDirect(idx) {
-            const track = playlist[idx];
-            downloadServerFile(track.url, `${track.title}.mp3`);
-        }
-
-        function downloadCurrentFolderFull() {
-            if(activeFolderSongsList.length === 0) return;
-            showToast("Baixando Álbum/Pasta Completa...");
-            activeFolderSongsList.forEach((song, i) => {
-                setTimeout(() => {
-                    downloadServerFile(song.url, song.filename);
-                }, i * 500);
-            });
-        }
-
-        function downloadFolderFromSidebar(index, event) {
-            event.stopPropagation();
-            const folder = folderDatabase[index];
-            const targetSongs = playlistManager[folder.key] || [];
-            if(targetSongs.length === 0) return;
-            showToast(`Baixando todas de: ${folder.name}`);
-            targetSongs.forEach((song, i) => {
-                setTimeout(() => {
-                    downloadServerFile(song.url, song.filename);
-                }, i * 500);
-            });
         }
 
         let trackerTimeout = null;
@@ -1711,7 +1449,6 @@
                     .catch(err => console.log('Falha ao registrar o Service Worker:', err));
             });
         }
-        
     </script>
 </body>
 </html>
