@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-title" content="Auto Play MJ">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/WJB55vX/119623.png">
+    <link class="apple-touch-icon" href="https://i.ibb.co/WJB55vX/119623.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1147,7 +1147,7 @@
                     const blobURL = URL.createObjectURL(file);
                     newFolder.songs.push({
                         title: file.name.replace(/\.[^/.]+$/, ""),
-                        artist: "Arquivo Local",
+                        artist: name,
                         url: blobURL
                     });
                 });
@@ -1197,6 +1197,9 @@
                             <button class="heart-btn ${isFav ? 'active-heart' : ''}" onclick="toggleFavoriteSong(${sIdx}, this)">
                                 <i class="fa-solid fa-heart"></i>
                             </button>
+                            <button class="track-item-action-btn" onclick="removeTrackFromFolder(${sIdx}, event)" style="color: #ff3333; margin-left: 5px;" title="Excluir música">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
                     `;
                     folderSongsContainer.appendChild(sItem);
@@ -1204,6 +1207,22 @@
             }
 
             folderViewOverlay.classList.add('open');
+        }
+
+        function removeTrackFromFolder(songIndex, event) {
+            event.stopPropagation();
+            if (currentActiveOpenFolderIdx === -1) {
+                favoriteTracks.splice(songIndex, 1);
+                localStorage.setItem('MJ_Favorites', JSON.stringify(favoriteTracks));
+                updateFavBadge();
+                openFolderContainer(-1);
+            } else {
+                const folder = importedFolders[currentActiveOpenFolderIdx];
+                folder.songs.splice(songIndex, 1);
+                renderFoldersUI();
+                openFolderContainer(currentActiveOpenFolderIdx);
+            }
+            showToast("Música excluída da pasta");
         }
 
         function closeFolderView() {
