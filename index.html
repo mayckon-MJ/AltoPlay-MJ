@@ -1021,7 +1021,8 @@
             return color;
         }
 
-        // FUNÇÕES DE PERSISTÊNCIA COMPLETA
+        //
+                // FUNÇÕES DE PERSISTÊNCIA COMPLETA
         function savePlayerState() {
             const state = {
                 playlist: playlist,
@@ -1032,8 +1033,17 @@
                 playedTracksUrls: playedTracksUrls
             };
             localStorage.setItem('MJ_PlayerState', JSON.stringify(state));
-            localStorage.setItem('MJ_ImportedFolders', JSON.stringify(importedFolders));
+            
+            // REMOVA as músicas com BLOB expirado antes de salvar as pastas no localStorage
+            const foldersToSave = importedFolders.map(folder => {
+                return {
+                    ...folder,
+                    songs: [] // Limpa os links antigos que já deixaram de funcionar
+                };
+            });
+            localStorage.setItem('MJ_ImportedFolders', JSON.stringify(foldersToSave));
         }
+
 
         function loadPlayerState() {
             const savedState = localStorage.getItem('MJ_PlayerState');
