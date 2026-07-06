@@ -374,9 +374,10 @@
 
         .track-item-title {
             font-size: 0.9rem;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .track-item.active-track .track-item-title {
@@ -594,9 +595,10 @@
 
         .server-song-title {
             font-size: 0.9rem;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
             margin-bottom: 2px;
         }
 
@@ -979,12 +981,12 @@
         let isPlaying = false;
         let playbackMode = 'list';
         let favoriteTracks = JSON.parse(localStorage.getItem('MJ_Favorites')) || [];
-        let importedFolders = []; 
+        let importedFolders = JSON.parse(localStorage.getItem('MJ_ImportedFolders')) || []; 
         let deferredPrompt = null;
 
         // Controle das faixas que já tocaram por completo
         let playedTracksUrls = [];
-        // Armazena o ID ou nome da última pasta ativa carregada para pular corretamente
+        // Armazena o ID ou nome da última pasta activa carregada para pular corretamente
         let currentActiveFolderName = "";
 
         const audioNode = new Audio();
@@ -1030,6 +1032,7 @@
                 playedTracksUrls: playedTracksUrls
             };
             localStorage.setItem('MJ_PlayerState', JSON.stringify(state));
+            localStorage.setItem('MJ_ImportedFolders', JSON.stringify(importedFolders));
         }
 
         function loadPlayerState() {
@@ -1104,6 +1107,7 @@
             if(confirm("Tem certeza que deseja apagar esta pasta completa e remover suas músicas?")) {
                 importedFolders.splice(index, 1);
                 renderFoldersUI();
+                savePlayerState();
                 showToast("Pasta apagada com sucesso!");
             }
         }
@@ -1209,6 +1213,7 @@
 
             showToast(`${folderNames.length} pasta(s) carregada(s) com sucesso!`);
             renderFoldersUI();
+            savePlayerState();
             toggleSidebar(true);
             event.target.value = ''; // Limpa o seletor
         }
@@ -1274,6 +1279,7 @@
                 renderFoldersUI();
                 openFolderContainer(currentActiveOpenFolderIdx);
             }
+            savePlayerState();
             showToast("Música excluída da pasta");
         }
 
@@ -1416,9 +1422,8 @@
             if (playlist.length === 0) return;
 
             if (playbackMode === 'loop') {
-                let nextIdx = currentIndex + 1;
-                if (nextIdx >= playlist.length) nextIdx = 0;
-                changeTrack(nextIdx, isPlaying);
+                audioNode.currentTime = 0;
+                playAudio();
             } else if (playbackMode === 'shuffle') {
                 let randomIdx = Math.floor(Math.random() * playlist.length);
                 changeTrack(randomIdx, isPlaying);
