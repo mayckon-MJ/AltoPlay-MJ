@@ -1059,6 +1059,16 @@
             loadPlayerState();
         });
 
+        // FUNÇÃO ADICIONADA PARA APAGAR A PASTA COMPLETA DO BANCO DE DADOS EM MEMÓRIA
+        function deleteWholeFolder(index, event) {
+            event.stopPropagation(); // Impede abrir a pasta ao clicar no botão de lixeira
+            if(confirm("Tem certeza que deseja apagar esta pasta completa e remover suas músicas?")) {
+                importedFolders.splice(index, 1);
+                renderFoldersUI();
+                showToast("Pasta apagada com sucesso!");
+            }
+        }
+
         function showToast(msg) {
             toastBox.innerText = msg;
             toastBox.classList.add('show');
@@ -1071,7 +1081,7 @@
             else sidebarOverlay.classList.remove('open');
         }
 
-        // ATUALIZA INTERFACE DAS PASTAS NA SIDEBAR
+        // ATUALIZA INTERFACE DAS PASTAS NA SIDEBAR (Alterado apenas para colocar o ícone da lixeira)
         function renderFoldersUI() {
             foldersContainer.innerHTML = "";
             if (importedFolders.length === 0) {
@@ -1087,15 +1097,18 @@
                 fItem.onclick = () => openFolderContainer(idx);
 
                 fItem.innerHTML = `
-                    <div class="folder-left" style="flex: 1;">
+                    <div class="folder-left" style="flex: 1; overflow: hidden;">
                         <div class="folder-icon-box" style="background: ${folder.color}; flex-shrink: 0;">
                             <i class="fa-solid fa-folder"></i>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <div class="folder-info-name" style="font-size: 13px;">${folder.name}</div>
+                        <div style="display: flex; flex-direction: column; gap: 2px; overflow: hidden;">
+                            <div class="folder-info-name" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${folder.name}</div>
                             <div style="font-size: 0.6rem; color: #888;">${folder.songs.length} música(s) nesta pasta</div>
                         </div>
                     </div>
+                    <button onclick="deleteWholeFolder(${idx}, event)" style="background: none; border: none; color: #ff3333; padding: 8px; cursor: pointer; font-size: 1rem; transition: color 0.2s;" title="Apagar Pasta Completa">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 `;
                 foldersContainer.appendChild(fItem);
             });
