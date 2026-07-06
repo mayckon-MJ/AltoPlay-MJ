@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -226,12 +225,12 @@
         }
 
         .track-name {
-            font-size: 1.0rem;
+            font-size: 0.9rem;
             font-weight: 500;
             margin-bottom: 4px;
             padding: 0 15px;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -753,6 +752,25 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(8px); }
         }
+
+        /* NOVOS ESTILOS PARA OS NOVOS BOTÕES HUD */
+        .hud-action-btn {
+            background: var(--vidro-bg);
+            border: 1px solid var(--vidro-borda);
+            padding: 8px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+        .hud-action-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 102, 0, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -813,6 +831,17 @@
             </div>
         </div>
         
+        <!-- NOVOS BOTÕES ADICIONADOS NO HUD -->
+        <button class="hud-action-btn" onclick="clearMainPlaylist()" title="Limpar Lista Principal">
+            <i class="fa-solid fa-broom" style="color: #ff3333;"></i> Limpar
+        </button>
+        <button class="hud-action-btn" onclick="jumpToFolderRelative(-1)" title="Voltar Pasta Anterior">
+            <i class="fa-solid fa-folder-minus" style="color: #3399ff;"></i> Voltar P.
+        </button>
+        <button class="hud-action-btn" onclick="jumpToFolderRelative(1)" title="Pular para Próxima Pasta">
+            <i class="fa-solid fa-folder-plus" style="color: #00ff66;"></i> Pular P.
+        </button>
+
         <label class="import-btn-label" for="folderImportInput" style="font-size:10px;">
             <i style="color: #d46a13;" class="fa-solid fa-folder-plus"></i> Importar<br>Pasta
         </label>
@@ -953,6 +982,11 @@
         let importedFolders = []; 
         let deferredPrompt = null;
 
+        // Controle das faixas que já tocaram por completo
+        let playedTracksUrls = [];
+        // Armazena o ID ou nome da última pasta ativa carregada para pular corretamente
+        let currentActiveFolderName = "";
+
         const audioNode = new Audio();
 
         // Elementos DOM
@@ -991,7 +1025,9 @@
                 playlist: playlist,
                 currentIndex: currentIndex,
                 playbackMode: playbackMode,
-                currentTime: audioNode.currentTime
+                currentTime: audioNode.currentTime,
+                currentActiveFolderName: currentActiveFolderName,
+                playedTracksUrls: playedTracksUrls
             };
             localStorage.setItem('MJ_PlayerState', JSON.stringify(state));
         }
@@ -1003,6 +1039,8 @@
                 playlist = state.playlist || [];
                 currentIndex = state.currentIndex !== undefined ? state.currentIndex : -1;
                 playbackMode = state.playbackMode || 'list';
+                currentActiveFolderName = state.currentActiveFolderName || "";
+                playedTracksUrls = state.playedTracksUrls || [];
                 
                 updatePlaybackModeUI(playbackMode);
                 renderPlaylistUI();
@@ -1246,6 +1284,11 @@
         // ENVIA A REPRODUÇÃO DA PASTA PARA A PLAYLIST PRINCIPAL
         function loadServerTrackToPlaylist(songIndex) {
             playlist = [...activeFolderSongsList];
+            if (currentActiveOpenFolderIdx !== -1 && importedFolders[currentActiveOpenFolderIdx]) {
+                currentActiveFolderName = importedFolders[currentActiveOpenFolderIdx].name;
+            } else if (currentActiveOpenFolderIdx === -1) {
+                currentActiveFolderName = "Favoritas";
+            }
             renderPlaylistUI();
             closeFolderView();
             changeTrack(songIndex, true);
@@ -1267,9 +1310,13 @@
                 const item = document.createElement('div');
                 item.className = `track-item ${index === currentIndex ? 'active-track' : ''}`;
                 
+                // Verifica se a música já foi escutada para atribuir cor vermelha
+                const hasPlayed = playedTracksUrls.includes(track.url);
+                const colorStyle = hasPlayed ? 'color: #ff3333;' : '';
+
                 item.innerHTML = `
                     <div class="track-item-info" onclick="changeTrack(${index}, true)">
-                        <div class="track-item-title">${track.title}</div>
+                        <div class="track-item-title" style="${colorStyle}">${track.title}</div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <button class="track-item-action-btn" onclick="removeTrackFromPlaylist(${index}, event)" style="color: #ff3333;" title="Remover da fila">
@@ -1326,7 +1373,7 @@
         // CONTROLES DE ÁUDIO NATURAIS
         function togglePlayPause() {
             if (playlist.length === 0) {
-                showToast("Nenhuma faixa ativa carregada.");
+                showToast("Nenhuma faixa activa carregada.");
                 return;
             }
             if (isPlaying) pauseAudio();
@@ -1377,8 +1424,12 @@
                 changeTrack(randomIdx, isPlaying);
             } else {
                 let nextIdx = currentIndex + 1;
-                if (nextIdx >= playlist.length) nextIdx = 0;
-                changeTrack(nextIdx, isPlaying);
+                if (nextIdx >= playlist.length) {
+                    // Ao tocar todas as músicas, pula para a próxima pasta
+                    jumpToFolderRelative(1);
+                } else {
+                    changeTrack(nextIdx, isPlaying);
+                }
             }
         }
 
@@ -1449,6 +1500,13 @@
         };
 
         audioNode.onended = function() {
+            // Guarda a URL da música atual que acabou de tocar para marcar em vermelho
+            if (currentIndex > -1 && playlist[currentIndex]) {
+                if (!playedTracksUrls.includes(playlist[currentIndex].url)) {
+                    playedTracksUrls.push(playlist[currentIndex].url);
+                }
+            }
+
             if (playbackMode === 'loop') {
                 audioNode.currentTime = 0;
                 playAudio();
@@ -1472,6 +1530,57 @@
             let m = Math.floor(secs / 60);
             let s = Math.floor(secs % 60);
             return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        // NOVAS FUNÇÕES ADICIONADAS CONFORME REQUISITOS
+
+        // Função para limpar a fila de reprodução atual
+        function clearMainPlaylist() {
+            playlist = [];
+            currentIndex = -1;
+            pauseAudio();
+            currentTrackTitle.innerText = "Nenhuma música na fila";
+            currentTrackIndex.innerText = "Abra o menu ou adicione mídias";
+            audioNode.src = "";
+            renderPlaylistUI();
+            savePlayerState();
+            showToast("Lista principal limpa!");
+        }
+
+        // Função auxiliar para pular ou voltar pastas nativamente em relação à atual
+        function jumpToFolderRelative(direction) {
+            if (importedFolders.length === 0) {
+                showToast("Nenhuma pasta importada encontrada.");
+                return;
+            }
+
+            let currentIdx = importedFolders.findIndex(f => f.name === currentActiveFolderName);
+            
+            if (currentIdx === -1) {
+                currentIdx = 0;
+            } else {
+                currentIdx += direction;
+            }
+
+            // Loop circular pelas pastas
+            if (currentIdx >= importedFolders.length) {
+                currentIdx = 0;
+            }
+            if (currentIdx < 0) {
+                currentIdx = importedFolders.length - 1;
+            }
+
+            const targetFolder = importedFolders[currentIdx];
+            if (targetFolder && targetFolder.songs && targetFolder.songs.length > 0) {
+                playlist = [...targetFolder.songs];
+                currentActiveFolderName = targetFolder.name;
+                renderPlaylistUI();
+                changeTrack(0, true);
+                showToast(`Mudou para: ${targetFolder.name}`);
+            } else {
+                showToast("A próxima pasta está vazia.");
+            }
+            savePlayerState();
         }
 
         // Registra o Service Worker para habilitar o PWA
